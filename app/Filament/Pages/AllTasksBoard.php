@@ -294,6 +294,37 @@ class AllTasksBoard extends KanbanBoard
 
     protected function editRecord($recordId, array $data, array $state): void
     {
+
+
+    // if ($data['progress'] == 100) {
+    //     $data['is_done'] = CompletedStatus::Done;
+    //     $data['status'] = 'review';
+    // } elseif ($data['progress'] > 0 && $data['progress'] < 100) {
+    //     $data['is_done'] = CompletedStatus::PendingReview;
+    //     $data['status'] = 'ongoing';
+    // } elseif ($data['progress'] == 0) {
+    //     $data['is_done'] = CompletedStatus::PendingReview;
+    //     $data['status'] = 'todo';
+    // }
+
+    // // Check if is_done is 'pending' and status is 'todo' to set progress to 0
+    // if (isset($data['is_done']) && $data['is_done'] === CompletedStatus::PendingReview && isset($data['status']) && $data['status'] === 'todo') {
+    //     $data['progress'] = 0;
+    // }
+
+    // Check progress and set corresponding is_done and status values
+    if ($data['progress'] == 100) {
+        $data['is_done'] = CompletedStatus::Done;
+        $data['status'] = TaskStatus::ForReview;
+    } elseif ($data['progress'] > 0 && $data['progress'] < 100) {
+        $data['is_done'] = CompletedStatus::PendingReview;
+        $data['status'] = TaskStatus::OnGoing;
+    } elseif ($data['progress'] == 0) {
+        $data['is_done'] = CompletedStatus::PendingReview;
+        $data['status'] = TaskStatus::Todo;
+    }
+    
+
         Task::find($recordId)->update([
             'title' => $data['title'],
             'description' => $data['description'],
@@ -302,7 +333,7 @@ class AllTasksBoard extends KanbanBoard
             'due_date' => $data['due_date'],
             'progress' => $data['progress'],
             'user_id' => $data['user_id'],
-            'is_done' => $data['is_done'],
+            'is_done' => $data['is_done'] ?? null,
             'text_color' => $data['text_color'],
             'bg_color' => $data['bg_color'],
             'status' => $data['status'],

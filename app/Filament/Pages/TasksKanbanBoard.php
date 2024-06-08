@@ -79,7 +79,7 @@ class TasksKanbanBoard extends KanbanBoard
 
         // Determine the start and end of the current week (Monday to Friday)
         $startOfWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY)->subDays(30);
-        $endOfWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY)->addDays(6);
+        $endOfWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY)->addDays(7);
 
         // Retrieve tasks created from Monday to Friday with status not equal to 'done'
         // and either belong to a team with the current authenticated user or are directly assigned to the current authenticated user
@@ -273,9 +273,23 @@ class TasksKanbanBoard extends KanbanBoard
 
     
 
+    
     protected function editRecord($recordId, array $data, array $state): void
     {
 
+
+    // Check progress and set corresponding is_done and status values
+    if ($data['progress'] == 100) {
+        $data['is_done'] = CompletedStatus::Done;
+        $data['status'] = TaskStatus::ForReview;
+    } elseif ($data['progress'] > 0 && $data['progress'] < 100) {
+        $data['is_done'] = CompletedStatus::PendingReview;
+        $data['status'] = TaskStatus::OnGoing;
+    } elseif ($data['progress'] == 0) {
+        $data['is_done'] = CompletedStatus::PendingReview;
+        $data['status'] = TaskStatus::Todo;
+    }
+    
 
         Task::find($recordId)->update([
             'title' => $data['title'],
@@ -285,14 +299,12 @@ class TasksKanbanBoard extends KanbanBoard
             'due_date' => $data['due_date'],
             'progress' => $data['progress'],
             'user_id' => $data['user_id'],
-            'is_done' => $data['is_done'],
+            'is_done' => $data['is_done'] ?? null,
             'text_color' => $data['text_color'],
             'bg_color' => $data['bg_color'],
             'status' => $data['status'],
 
         ]);
-
-        // $this->logRecordAfter($this->recordId);
     }
 
     protected function getHeaderActions(): array
