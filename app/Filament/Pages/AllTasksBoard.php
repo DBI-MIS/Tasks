@@ -296,24 +296,8 @@ class AllTasksBoard extends KanbanBoard
     {
 
 
-    // if ($data['progress'] == 100) {
-    //     $data['is_done'] = CompletedStatus::Done;
-    //     $data['status'] = 'review';
-    // } elseif ($data['progress'] > 0 && $data['progress'] < 100) {
-    //     $data['is_done'] = CompletedStatus::PendingReview;
-    //     $data['status'] = 'ongoing';
-    // } elseif ($data['progress'] == 0) {
-    //     $data['is_done'] = CompletedStatus::PendingReview;
-    //     $data['status'] = 'todo';
-    // }
-
-    // // Check if is_done is 'pending' and status is 'todo' to set progress to 0
-    // if (isset($data['is_done']) && $data['is_done'] === CompletedStatus::PendingReview && isset($data['status']) && $data['status'] === 'todo') {
-    //     $data['progress'] = 0;
-    // }
-
-    // Check progress and set corresponding is_done and status values
-    if ($data['progress'] == 100) {
+     // Check progress and set corresponding is_done and status values
+     if ($data['progress'] == 100) {
         $data['is_done'] = CompletedStatus::Done;
         $data['status'] = TaskStatus::ForReview;
     } elseif ($data['progress'] > 0 && $data['progress'] < 100) {
@@ -441,6 +425,8 @@ class AllTasksBoard extends KanbanBoard
 
 
                 ]),
+
+                
 
 
         ];
