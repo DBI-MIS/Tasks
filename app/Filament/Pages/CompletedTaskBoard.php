@@ -160,7 +160,7 @@ class CompletedTaskBoard extends KanbanBoard
                     ])
                         ->label('Task Name')
                         ->hint('')
-                        ->helperText('*Description can be Blank')->columnSpanFull(),
+                        ->helperText('*Description')->columnSpanFull(),
 
                     Cluster::make([
 
@@ -303,7 +303,7 @@ class CompletedTaskBoard extends KanbanBoard
     //                 ])
     //                     ->label('Task Name')
     //                     ->hint('')
-    //                     ->helperText('*Description can be Blank')->columns(1),
+    //                     ->helperText('*Description)->columns(1),
 
     //                 Cluster::make([
 

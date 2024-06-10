@@ -71,35 +71,60 @@ class TasksKanbanBoard extends KanbanBoard
     use LogCreateRecord;
     use LogEditRecord;
 
-    protected function records(): Collection
-    {
-        // Get current date and the weekday number (0 for Sunday, 1 for Monday, etc.)
-        $currentDate = Carbon::now();
-        $currentWeekday = $currentDate->dayOfWeek;
+    // protected function records(): Collection
+    // {
+    //     // Get current date and the weekday number (0 for Sunday, 1 for Monday, etc.)
+    //     $currentDate = Carbon::now();
+    //     $currentWeekday = $currentDate->dayOfWeek;
 
-        // Determine the start and end of the current week (Monday to Friday)
-        $startOfWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY)->subDays(30);
-        $endOfWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY)->addDays(7);
+    //     // Determine the start and end of the current week (Monday to Friday)
+    //     $startOfWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY)->subDays(30);
+    //     $endOfWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY)->addDays(7);
 
-        // Retrieve tasks created from Monday to Friday with status not equal to 'done'
-        // and either belong to a team with the current authenticated user or are directly assigned to the current authenticated user
-        return Task::ordered()
-        ->where(function ($query) use ($startOfWeek, $endOfWeek) {
-            $query->where('is_done', '!=', 'done')
-                  ->orWhereBetween('created_at', [$startOfWeek, $endOfWeek]);
-        })
+    //     // Retrieve tasks created from Monday to Friday with status not equal to 'done'
+    //     // and either belong to a team with the current authenticated user or are directly assigned to the current authenticated user
+    //     return Task::ordered()
+    //     ->where(function ($query) use ($startOfWeek, $endOfWeek) {
+    //         $query->where('is_done', '!=', 'done')
+    //               ->orWhereBetween('created_at', [$startOfWeek, $endOfWeek]);
+    //     })
         
-                    // ->where('is_done', '!=', 'done')
-                    // ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
+    //                 // ->where('is_done', '!=', 'done')
+    //                 // ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
                     
-                    ->where(function ($query) {
-                        $query->whereHas('team', function ($query) {
-                            $query->where('user_id', auth()->id());
-                        })
-                        ->orWhere('user_id', auth()->id());
-                    })
-                    ->get();
-    }
+    //                 ->where(function ($query) {
+    //                     $query->whereHas('team', function ($query) {
+    //                         $query->where('user_id', auth()->id());
+    //                     })
+    //                     ->orWhere('user_id', auth()->id());
+    //                 })
+    //                 ->get();
+    // }
+
+    protected function records(): Collection
+{
+    // Get current date and determine the start and end of the period (last 30 days)
+    $currentDate = Carbon::now();
+    $startOfPeriod = $currentDate->copy()->subDays(30);
+    $endOfPeriod = $currentDate;
+
+    // Retrieve tasks created from Monday to Friday with status not equal to 'done'
+    // and either belong to a team with the current authenticated user or are directly assigned to the current authenticated user
+    return Task::where(function ($query) use ($startOfPeriod, $endOfPeriod) {
+            $query->where('is_done', '!=', 'done')
+                  ->whereBetween('created_at', [$startOfPeriod, $endOfPeriod])
+                  ->where(function ($query) {
+                      $query->whereHas('team', function ($query) {
+                          $query->where('user_id', auth()->id());
+                      })
+                      ->orWhere('user_id', auth()->id());
+                  });
+        })
+        ->where(function ($query) {
+            $query->whereRaw("WEEKDAY(created_at) BETWEEN 0 AND 4");
+        })
+        ->get();
+}
 
     public function onStatusChanged(int $recordId, string $status, array $fromOrderedIds, array $toOrderedIds): void
     {
@@ -168,7 +193,7 @@ class TasksKanbanBoard extends KanbanBoard
                     ])
                         ->label('Task Name')
                         ->hint('')
-                        ->helperText('*Description can be Blank')->columnSpan(3),
+                        ->helperText('*Description')->columnSpan(3),
 
                     Cluster::make([
 
@@ -253,12 +278,14 @@ class TasksKanbanBoard extends KanbanBoard
                                 'todo' => 'Back to Todo',
                                 'ongoing' => 'On-Going',
                                 'review' => 'For Review',
+                                'done' => 'Done',
                                 'deleted' => 'Delete',
                             ])
                             ->colors([
                                 'todo' => 'info',
                                 'ongoing' => 'warning',
                                 'review' => 'success',
+                                'done' => 'success',
                                 'deleted' => 'danger',
                             ])
 
@@ -270,8 +297,6 @@ class TasksKanbanBoard extends KanbanBoard
     {
         return Task::find($recordId)->toArray();
     }
-
-    
 
     
     protected function editRecord($recordId, array $data, array $state): void
@@ -327,7 +352,7 @@ class TasksKanbanBoard extends KanbanBoard
                     ])
                         ->label('Task Name')
                         ->hint('')
-                        ->helperText('*Description can be Blank')->columns(1),
+                        ->helperText('*Description')->columns(1),
 
                     Cluster::make([
 

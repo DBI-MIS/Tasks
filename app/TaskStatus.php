@@ -11,6 +11,7 @@ enum TaskStatus: string
     case Todo = 'todo';
     case OnGoing = 'ongoing';
     case ForReview = 'review';
+    case Done = 'done';
     case Delete = 'deleted';
 
     public static function kanbanCases(): array

@@ -95,20 +95,22 @@ class AllTasksBoard extends KanbanBoard
 
     protected function records(): Collection
     {
-        // Get current date and the weekday number (0 for Sunday, 1 for Monday, etc.)
+        // Get current date and determine the start and end of the period (last 30 days)
         $currentDate = Carbon::now();
-        $currentWeekday = $currentDate->dayOfWeek;
-
-        // Determine the start and end of the current week (Monday to Friday)
-        $startOfWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY);
-        $endOfWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY)->addDays(7);
-
-        // Retrieve tasks created from Monday to Friday and with status not equal to 'done'
-        return Task::ordered()
-            ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
+        $startOfPeriod = $currentDate->copy()->subDays(30);
+        $endOfPeriod = $currentDate;
+    
+        // Retrieve tasks created from Monday to Friday with status not equal to 'done'
+        // and either belong to a team with the current authenticated user or are directly assigned to the current authenticated user
+        return Task::where(function ($query) use ($startOfPeriod, $endOfPeriod) {
+                $query->where('is_done', '!=', 'done')
+                      ->whereBetween('created_at', [$startOfPeriod, $endOfPeriod]);
+            })
+            ->where(function ($query) {
+                $query->whereRaw("WEEKDAY(created_at) BETWEEN 0 AND 4");
+            })
             ->get();
     }
-
 
     public function onStatusChanged(int $recordId, string $status, array $fromOrderedIds, array $toOrderedIds): void
     {
@@ -178,7 +180,7 @@ class AllTasksBoard extends KanbanBoard
                     ])
                         ->label('Task Name')
                         ->hint('')
-                        ->helperText('*Description can be Blank')->columnSpan(3),
+                        ->helperText('*Description')->columnSpan(3),
 
                     Cluster::make([
 
@@ -345,7 +347,7 @@ class AllTasksBoard extends KanbanBoard
                     ])
                         ->label('Task Name')
                         ->hint('')
-                        ->helperText('*Description can be Blank')->columns(1),
+                        ->helperText('*Description')->columns(1),
 
                     Cluster::make([
 
