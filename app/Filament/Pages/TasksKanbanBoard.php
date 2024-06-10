@@ -17,6 +17,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Components\ViewField;
+use Filament\Forms\Get;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\IconPosition;
@@ -54,77 +55,32 @@ class TasksKanbanBoard extends KanbanBoard
     protected static ?string $navigationGroup = 'Board';
     protected static ?string $title = 'My Tasks';
 
-    // protected function records(): Collection
-    // {
-
-    //     return Task::ordered()
-    //         ->whereHas(
-    //             'team',
-    //             function ($query) {
-    //                 return $query->where('user_id', auth()->id());
-    //             }
-    //         )
-    //         ->orWhere('user_id', auth()->id())
-    //         ->get();
-    // }
 
     use LogCreateRecord;
     use LogEditRecord;
 
-    // protected function records(): Collection
-    // {
-    //     // Get current date and the weekday number (0 for Sunday, 1 for Monday, etc.)
-    //     $currentDate = Carbon::now();
-    //     $currentWeekday = $currentDate->dayOfWeek;
-
-    //     // Determine the start and end of the current week (Monday to Friday)
-    //     $startOfWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY)->subDays(30);
-    //     $endOfWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY)->addDays(7);
-
-    //     // Retrieve tasks created from Monday to Friday with status not equal to 'done'
-    //     // and either belong to a team with the current authenticated user or are directly assigned to the current authenticated user
-    //     return Task::ordered()
-    //     ->where(function ($query) use ($startOfWeek, $endOfWeek) {
-    //         $query->where('is_done', '!=', 'done')
-    //               ->orWhereBetween('created_at', [$startOfWeek, $endOfWeek]);
-    //     })
-        
-    //                 // ->where('is_done', '!=', 'done')
-    //                 // ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
-                    
-    //                 ->where(function ($query) {
-    //                     $query->whereHas('team', function ($query) {
-    //                         $query->where('user_id', auth()->id());
-    //                     })
-    //                     ->orWhere('user_id', auth()->id());
-    //                 })
-    //                 ->get();
-    // }
-
     protected function records(): Collection
-{
-    // Get current date and determine the start and end of the period (last 30 days)
-    $currentDate = Carbon::now();
-    $startOfPeriod = $currentDate->copy()->subDays(30);
-    $endOfPeriod = $currentDate;
-
-    // Retrieve tasks created from Monday to Friday with status not equal to 'done'
-    // and either belong to a team with the current authenticated user or are directly assigned to the current authenticated user
-    return Task::where(function ($query) use ($startOfPeriod, $endOfPeriod) {
-            $query->where('is_done', '!=', 'done')
-                  ->whereBetween('created_at', [$startOfPeriod, $endOfPeriod])
-                  ->where(function ($query) {
-                      $query->whereHas('team', function ($query) {
-                          $query->where('user_id', auth()->id());
-                      })
-                      ->orWhere('user_id', auth()->id());
-                  });
-        })
-        ->where(function ($query) {
-            $query->whereRaw("WEEKDAY(created_at) BETWEEN 0 AND 4");
-        })
-        ->get();
-}
+    {
+        // Get current date and the weekday number (0 for Sunday, 1 for Monday, etc.)
+        $currentDate = Carbon::now();
+        $startOfPeriod = $currentDate->copy()->subDays(30);
+        $endOfPeriod = $currentDate;
+    
+        // Retrieve tasks created from Monday to Friday with status not equal to 'done'
+        // and either belong to a team with the current authenticated user or are directly assigned to the current authenticated user
+        return Task::where(function ($query) use ($startOfPeriod, $endOfPeriod) {
+                $query->where('is_done', '!=', 'done')
+                      ->whereBetween('created_at', [$startOfPeriod, $endOfPeriod]);
+            })
+                    
+                    ->where(function ($query) {
+                        $query->whereHas('team', function ($query) {
+                            $query->where('user_id', auth()->id());
+                        })
+                        ->orWhere('user_id', auth()->id());
+                    })
+                    ->get();
+    }
 
     public function onStatusChanged(int $recordId, string $status, array $fromOrderedIds, array $toOrderedIds): void
     {
@@ -149,10 +105,13 @@ class TasksKanbanBoard extends KanbanBoard
                         ->options(CompletedStatus::class)
                         ->descriptions(CompletedStatus::class)
                         ->icons(CompletedStatus::class)
-                        ->required()
+                        ->default(CompletedStatus::PendingReview)
                         ->iconSize(IconSize::Small)
                         ->iconPosition(IconPosition::Before)
                         ->alignment(Alignment::Center)
+                        ->visible(function (Get $get) { 
+                            return $get('status') == 'review'; 
+                        }) 
                         ->extraCardsAttributes([
                             'class' => 'rounded-md'
                         ])
@@ -177,7 +136,7 @@ class TasksKanbanBoard extends KanbanBoard
                         ->prefix('Progress')
                         ->numeric()
                         ->maxValue(100)
-                        ->minValue(0)
+                        ->minValue(-1)
                         ->suffix('%')
                         ->columnSpan(2),
 
@@ -272,22 +231,23 @@ class TasksKanbanBoard extends KanbanBoard
                             ->label('Customization - Text Color | BG Color')
                             ->hint('Default is White Text & Blue Background')
                             ->helperText(' ')->columnSpan(3),
-                            ToggleButtons::make('status')
-                            ->label('Set')->inline()->grouped()
-                            ->options([
-                                'todo' => 'Back to Todo',
-                                'ongoing' => 'On-Going',
-                                'review' => 'For Review',
-                                'done' => 'Done',
-                                'deleted' => 'Delete',
-                            ])
-                            ->colors([
-                                'todo' => 'info',
-                                'ongoing' => 'warning',
-                                'review' => 'success',
-                                'done' => 'success',
-                                'deleted' => 'danger',
-                            ])
+                            // ToggleButtons::make('status')
+                            // ->label('Set')->inline()->grouped()
+                            // ->live()
+                            // ->options([
+                            //     'todo' => 'Back to Todo',
+                            //     'ongoing' => 'On-Going',
+                            //     'review' => 'For Review',
+                            //     'done' => 'Done',
+                            //     'deleted' => 'Delete',
+                            // ])
+                            // ->colors([
+                            //     'todo' => 'info',
+                            //     'ongoing' => 'warning',
+                            //     'review' => 'success',
+                            //     'done' => 'success',
+                            //     'deleted' => 'danger',
+                            // ])
 
                 ])->columns(3),
         ];
@@ -302,19 +262,22 @@ class TasksKanbanBoard extends KanbanBoard
     protected function editRecord($recordId, array $data, array $state): void
     {
 
+        
+// Determine status based on progress
+if ($data['progress'] == 100) {
+    // Task progress is 100%
+    $data['status'] = TaskStatus::ForReview;
+} elseif ($data['progress'] > 0 && $data['progress'] < 100) {
+    // Task is ongoing
+    $data['status'] = TaskStatus::OnGoing;
+} elseif ($data['progress'] == 0) {
+    // Task is yet to be started
+    $data['status'] = TaskStatus::Todo;
+}  elseif ($data['progress'] == -1) {
+    // Task is marked for deletion
+    $data['status'] = TaskStatus::Delete;
+} 
 
-    // Check progress and set corresponding is_done and status values
-    if ($data['progress'] == 100) {
-        $data['is_done'] = CompletedStatus::Done;
-        $data['status'] = TaskStatus::ForReview;
-    } elseif ($data['progress'] > 0 && $data['progress'] < 100) {
-        $data['is_done'] = CompletedStatus::PendingReview;
-        $data['status'] = TaskStatus::OnGoing;
-    } elseif ($data['progress'] == 0) {
-        $data['is_done'] = CompletedStatus::PendingReview;
-        $data['status'] = TaskStatus::Todo;
-    }
-    
 
         Task::find($recordId)->update([
             'title' => $data['title'],
@@ -324,7 +287,7 @@ class TasksKanbanBoard extends KanbanBoard
             'due_date' => $data['due_date'],
             'progress' => $data['progress'],
             'user_id' => $data['user_id'],
-            'is_done' => $data['is_done'] ?? null,
+            'is_done' => $data['is_done'] ?? 'pending',
             'text_color' => $data['text_color'],
             'bg_color' => $data['bg_color'],
             'status' => $data['status'],

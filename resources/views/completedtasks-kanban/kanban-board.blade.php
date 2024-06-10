@@ -1,12 +1,12 @@
 <x-filament-panels::page>
-    <span class="text-slate-200 text-[12px]">Drag this sH.***</span>
+    <span class="text-slate-400 text-[12px]">Drag Up to Send Back for Review or Drag Down to Undone</span>
         <div class="">
             <div x-data wire:ignore.self >
                     @foreach($statuses as $status)
               
         
                     @include(static::$statusView)
-                    <hr>
+                    
                     @endforeach
                 
         

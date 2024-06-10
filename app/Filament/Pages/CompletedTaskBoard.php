@@ -69,19 +69,16 @@ class CompletedTaskBoard extends KanbanBoard
     {
         // Get current date and the weekday number (0 for Sunday, 1 for Monday, etc.)
         $currentDate = Carbon::now();
-        $currentWeekday = $currentDate->dayOfWeek;
-
-        // Determine the start and end of the current week (Monday to Friday)
-        $startOfWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY);
-        $endOfWeek = $currentDate->copy()->startOfWeek(Carbon::MONDAY)->addDays(6);
-
+        $startOfPeriod = $currentDate->copy()->subDays(30);
+        $endOfPeriod = $currentDate;
+    
         // Retrieve tasks created from Monday to Friday with status not equal to 'done'
         // and either belong to a team with the current authenticated user or are directly assigned to the current authenticated user
-        return Task::ordered()
-        ->where(function ($query) use ($startOfWeek, $endOfWeek) {
-            $query->where('is_done', '!=', 'undone')
-                  ->orWhereBetween('created_at', [$startOfWeek, $endOfWeek]);
-        })
+        return Task::where(function ($query) use ($startOfPeriod, $endOfPeriod) {
+                $query->where('is_done', '=', 'done')
+                      ->whereBetween('created_at', [$startOfPeriod, $endOfPeriod]);
+            })
+                    
                     ->where(function ($query) {
                         $query->whereHas('team', function ($query) {
                             $query->where('user_id', auth()->id());
@@ -239,17 +236,12 @@ class CompletedTaskBoard extends KanbanBoard
                             ->hint('Default is White Text & Blue Background')
                             ->helperText(' ')->columnSpan(3),
                             ToggleButtons::make('is_done')
-                            ->label('Set')->inline()->grouped()
+                            ->label(' ')->inline()->grouped()
                             ->options([
-                                'pending' => 'Back to Review',
-                                'done' => 'Done',
-                                'undone' => 'Undone',
                                 'deleted' => 'Delete',
                             ])
                             ->colors([
-                                'pending' => 'warning',
-                                'done' => 'success',
-                                'undone' => 'info',
+                               
                                 'deleted' => 'danger',
                             ])
                             
