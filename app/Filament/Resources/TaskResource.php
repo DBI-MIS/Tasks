@@ -153,16 +153,35 @@ class TaskResource extends Resource
                 SelectFilter::make('user')->relationship('user', 'name'),
                 Filter::make('created_at')
             ->form([
-        Forms\Components\DatePicker::make('created_from'),
+        Forms\Components\DatePicker::make('created_from')->format('m-d-Y h:i A'),
         Forms\Components\DatePicker::make('created_until')->default(now()),
         
-            ]),
+            ])->query(function (Builder $query, array $data): Builder {
+                return $query
+                    ->when(
+                        $data['created_from'],
+                        fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                    )
+                    ->when(
+                        $data['created_until'],
+                        fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                    );})
+            ,
             Filter::make('updated_at')
             ->form([
         Forms\Components\DatePicker::make('updated_from'),
         Forms\Components\DatePicker::make('updated_until')->default(now()),
         
-    ])
+    ])->query(function (Builder $query, array $data): Builder {
+        return $query
+            ->when(
+                $data['updated_from'],
+                fn (Builder $query, $date): Builder => $query->whereDate('updated_at', '>=', $date),
+            )
+            ->when(
+                $data['updated_until'],
+                fn (Builder $query, $date): Builder => $query->whereDate('updated_at', '<=', $date),
+            );})
                 //
             ])
             ->actions([
