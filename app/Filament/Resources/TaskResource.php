@@ -149,6 +149,8 @@ class TaskResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])->defaultSort('updated_at','desc')
+            ->persistSortInSession()
+            ->defaultPaginationPageOption(25)
             ->filters([
                 SelectFilter::make('user')->relationship('user', 'name'),
                 Filter::make('created_at')
