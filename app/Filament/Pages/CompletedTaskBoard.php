@@ -37,6 +37,8 @@ class CompletedTaskBoard extends KanbanBoard
 
     protected static string $statusView = 'completedtasks-kanban.kanban-status';
 
+    protected static string $scriptsView = 'completedtasks-kanban.kanban-scripts';
+
     protected static string $recordStatusAttribute = 'is_done';
 
     protected static string $model = Task::class;
@@ -134,7 +136,7 @@ class CompletedTaskBoard extends KanbanBoard
 
                     Toggle::make('urgent')
                         ->required()
-                        ->columnSpan(1),
+                        ->columnSpan(3),
 
                     TextInput::make('progress')
                         ->label('')
@@ -143,7 +145,7 @@ class CompletedTaskBoard extends KanbanBoard
                         ->maxValue(100)
                         ->minValue(0)
                         ->suffix('%')
-                        ->columnSpan(2),
+                        ->columnSpan(3),
 
                     Cluster::make([
                         TextInput::make('title')

@@ -42,6 +42,8 @@ class NotesBoard extends KanbanBoard
 
     protected static string $statusView = 'mynotes-kanban.kanban-status';
 
+    protected static string $scriptsView = 'mynotes-kanban.kanban-scripts';
+
 
     protected function records(): Collection
     {

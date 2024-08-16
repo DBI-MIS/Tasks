@@ -45,6 +45,8 @@ class TasksKanbanBoard extends KanbanBoard
 
     protected static string $statusView = 'mytasks-kanban.kanban-status';
 
+    protected static string $scriptsView = 'mytasks-kanban.kanban-scripts';
+
     protected static string $model = Task::class;
 
     protected static string $statusEnum = TaskStatus::class;
@@ -129,7 +131,7 @@ class TasksKanbanBoard extends KanbanBoard
                 ->schema([
                     Toggle::make('urgent')
                         ->required()
-                        ->columnSpan(1),
+                        ->columnSpan(3),
 
                     TextInput::make('progress')
                         ->label('')
@@ -138,7 +140,7 @@ class TasksKanbanBoard extends KanbanBoard
                         ->maxValue(100)
                         ->minValue(-1)
                         ->suffix('%')
-                        ->columnSpan(2),
+                        ->columnSpan(3),
 
                     Cluster::make([
                         TextInput::make('title')
@@ -164,6 +166,7 @@ class TasksKanbanBoard extends KanbanBoard
                         DatePicker::make('due_date')
                             ->label('Due Date')
                             ->date('D - M d, Y')
+                            ->default(Carbon::now())
                             ->nullable()->columnSpan(1),
                     ])
                         ->label('Project')
@@ -326,6 +329,7 @@ if ($data['progress'] == 100) {
                         DatePicker::make('due_date')
                             ->label('Due Date')
                             ->date('D - M d, Y')
+                            ->default(Carbon::now())
                             ->nullable(),
 
                     ])

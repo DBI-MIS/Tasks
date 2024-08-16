@@ -28,6 +28,7 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\Indicator;
 
 class TaskResource extends Resource
 {
@@ -37,7 +38,7 @@ class TaskResource extends Resource
 
     protected static ?string $navigationGroup = 'Board';
 
-    protected static ?string $title = 'History';
+    protected static ?string $label = 'Task History';
 
     protected static bool $shouldRegisterNavigation = true;
 
@@ -149,12 +150,27 @@ class TaskResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])->defaultSort('updated_at','desc')
-            ->persistSortInSession()
-            ->defaultPaginationPageOption(25)
-            ->filters([
-                SelectFilter::make('user')->relationship('user', 'name'),
+                ->persistSortInSession()
+                ->defaultPaginationPageOption(50)
+                ->filters([
+
+                SelectFilter::make('user')
+                ->relationship('user', 'name', function (Builder $query) {
+                    if (auth()->user()->role === 'ADMIN') {
+                        // Show all users if the role is 'ADMIN'
+                        // No need to include withTrashed() here
+                    } else {
+                        // Show only the user themselves if they are not 'ADMIN'
+                        $query->where('id', auth()->user()->id);
+                    }
+                })
+                ->default(auth()->user()->id)
+                ->label('User')
+                ->selectablePlaceholder(false)
+                ->indicator('User'),
+
                 Filter::make('created_at')
-            ->form([
+                ->form([
         Forms\Components\DatePicker::make('created_from')->format('m-d-Y h:i A'),
         Forms\Components\DatePicker::make('created_until')->default(now()),
         

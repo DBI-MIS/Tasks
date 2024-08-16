@@ -22,6 +22,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Joaopaulolndev\FilamentGeneralSettings\FilamentGeneralSettingsPlugin;
 use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 use Swis\Filament\Backgrounds\FilamentBackgroundsPlugin;
+use Swis\Filament\Backgrounds\ImageProviders\MyImages;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -78,14 +79,13 @@ class AdminPanelProvider extends PanelProvider
                     ->setNavigationGroup('Settings')
                     ->setTitle('General Settings')
                     ->setNavigationLabel('General Settings'),
-                FilamentFullCalendarPlugin::make(),
                 FilamentBackgroundsPlugin::make()
                 ->showAttribution(false)
-                ->remember(5000),
-                // ->imageProvider(
-                //     MyImages::make()
-                //         ->directory('images/backgrounds')
-                // )
+                ->remember(300)
+                ->imageProvider(
+                    MyImages::make()
+                        ->directory('images/backgrounds')
+                ),
                 ])
                 
                 ;

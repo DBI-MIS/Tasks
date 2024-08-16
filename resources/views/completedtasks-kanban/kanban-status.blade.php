@@ -9,7 +9,7 @@
 
     <div
 data-status-id="{{ $status['id'] }}"
-class="flex flex-wrap gap-y-3 my-4 gap-x-2" 
+class="flex flex-wrap gap-y-3 my-4 gap-x-2 " 
 >
 
 

@@ -13,7 +13,7 @@ class TaskPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() ||  $user->isEditor() ||  $user->isUser();
     }
 
     /**
@@ -21,7 +21,7 @@ class TaskPolicy
      */
     public function view(User $user, Task $task): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() ||  $user->isEditor() ||  $user->isUser();
     }
 
     /**

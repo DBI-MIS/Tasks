@@ -1,24 +1,8 @@
 
-{{-- @props(['status'])
-
-<div class="max-w-[500px] flex-1">
-    @include(static::$headerView)
-    <div data-status-id="{{ $status['id'] }}" class="flex-wrap gap-x-2 gap-y-3 mb-7 mt-7">
-        
-        <div class="bg-red-500 h-10">Dropzone</div>
-
-
-
-        @foreach ($status['records'] as $record)
-            @include(static::$recordView)
-        @endforeach
-    </div>
-</div> --}}
-
 
 @props(['status'])
 
-<div class="max-w-[500px] flex-1">
+<div class="flex-1">
     {{-- Include the header view --}}
     @include(static::$headerView)
 
@@ -28,7 +12,7 @@
         @endif
 
     {{-- Container for the status records --}}
-    <div data-status-id="{{ $status['id'] }}" class="flex-wrap gap-x-2 gap-y-3 mb-7 mt-7">
+    <div data-status-id="{{ $status['id'] }}" class="block gap-x-2 gap-y-3 mb-7 mt-7 my-4 max-w-[300px] sm:max-w-full">
 
         {{-- Loop through each record in the status and include the record view --}}
         @foreach ($status['records'] as $record)

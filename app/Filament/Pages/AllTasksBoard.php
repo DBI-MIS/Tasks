@@ -50,6 +50,8 @@ class AllTasksBoard extends KanbanBoard
 
     protected static string $statusView = 'alltasks-kanban.kanban-status';
 
+    protected static string $scriptsView = 'alltasks-kanban.kanban-scripts';
+
     public static function shouldRegisterNavigation(): bool
     {
         $user = Auth::user();
@@ -158,7 +160,7 @@ class AllTasksBoard extends KanbanBoard
 
                     Toggle::make('urgent')
                         ->required()
-                        ->columnSpan(1),
+                        ->columnSpan(3),
 
                     TextInput::make('progress')
                         ->label('')
@@ -167,7 +169,7 @@ class AllTasksBoard extends KanbanBoard
                         ->maxValue(100)
                         ->minValue(0)
                         ->suffix('%')
-                        ->columnSpan(2),
+                        ->columnSpan(3),
 
                     Cluster::make([
                         TextInput::make('title')
@@ -360,6 +362,7 @@ if ($data['progress'] == 100) {
                         DatePicker::make('due_date')
                             ->label('Due Date')
                             ->date('D - M d, Y')
+                            ->default(Carbon::now())
                             ->nullable(),
 
                     ])
