@@ -1,15 +1,20 @@
-<div id="{{ $record->getKey() }}" wire:click="recordClicked('{{ $record->getKey() }}', {{ @json_encode($record) }})"
+@props(['record'])
+
+<div id="{{ $record->getKey() }}"
     class="record flex flex-col {{ $record->bg_color }} dark:bg-gray-700 rounded-md p-4 cursor-grab  dark:text-gray-200 border-l-8 shadow-md border-slate-300 
     {{ $record->text_color }} justify-between
     min-w-[200px] min-h-[180px] max-w-[300px] max-h-[240px] flex-1"
-    @if ($record->timestamps && now()->diffInSeconds($record->{$record::UPDATED_AT}) < 3) x-data x-init="
+    @if ($record->timestamps && now()->diffInSeconds($record->{$record::UPDATED_AT}) < 3) 
+    x-data 
+    x-init="
             $el.classList.add('animate-pulse-twice', 'bg-primary-100', 'dark:bg-primary-800')
             $el.classList.remove('bg-white', 'dark:bg-gray-700')
             setTimeout(() => {
                 $el.classList.remove('bg-primary-100', 'dark:bg-primary-800')
                 $el.classList.add('{{ $record->bg_color }}', 'dark:bg-gray-700')
             }, 3000)
-        " @endif>
+        " 
+        @endif>
 
     <div class="flex flex-col justify-between mb-2">
         <div class="flex flex-row justify-between mb-2">
@@ -47,14 +52,25 @@
 
 
     </div>
-    <span class="text-xs font-light"> {{ $record->progress }}% Progress</span>
+    {{-- <span class="text-xs font-light"> {{ $record->progress }}% Progress</span>
     <div class="h-3 w-full relative mb-2">
         <div class="h-1 bg-gray-200 rounded-full absolute w-full"></div>
         <div class="h-1 absolute rounded-full bg-blue-600 " style="width: {{ $record->progress }}%"></div>
-    </div>
+    </div> --}}
 
-    <div class="font-light text-xs">
-        Updated {{ $record->updated_at->diffForHumans() }}
-
+    <div class="w-full flex flex-row justify-between items-center">
+        <span class="font-light text-xs float-left">
+            Updated {{ $record->updated_at->diffForHumans() }}
+        </span>
+        <button wire:click="recordClicked('{{ $record->getKey() }}', {{ @json_encode($record) }})"
+            style="width: 20px">
+            <abbr title="Edit Task">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                </svg>
+            </abbr>
+        </button>
     </div>
 </div>

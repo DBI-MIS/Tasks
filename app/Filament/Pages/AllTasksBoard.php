@@ -8,6 +8,7 @@ use App\Models\Task;
 use App\Models\User;
 use App\TaskStatus;
 use Carbon\Carbon;
+use Closure;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
@@ -34,6 +35,7 @@ use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Get;
+use Filament\Forms\Set;
 use SearchableTrait;
 
 class AllTasksBoard extends KanbanBoard
@@ -86,7 +88,9 @@ class AllTasksBoard extends KanbanBoard
 
     protected string $editModalCancelButtonLabel = 'Cancel';
 
-    protected bool $editModalSlideOver = false;
+    protected bool $editModalSlideOver = true;
+
+    // public bool $disableEditModal = true;
 
 
     // protected function records(): Collection
@@ -188,10 +192,62 @@ class AllTasksBoard extends KanbanBoard
                     Cluster::make([
 
 
-                        TextInput::make('project')
-                            ->label('Project')
-                            ->nullable()
-                            ->columnSpan(1),
+                    Select::make('project')
+                        ->label('Type')
+                        ->default('support assistance')
+                        ->live()
+                        ->options([
+                            'support assistance' => 'Support/Assistance',
+                            'troubleshooting' => 'Troubleshooting',
+                            'installation' => 'Installation',
+                            'update' => 'Update',
+                            'technical support' => 'Technical Support',
+                            'system management' => 'System Management',
+                            'web development' => 'Web Development',
+                            'email account management' => 'Email/Account Management',
+                            'backup management' => 'Backup Management',
+                            'preventive maintenance' => 'Preventive Maintenance',
+                            'printing editing' => 'Printing/Editing',
+                            'desktop publishing' => 'Desktop Publishing',
+                            'others' => 'Others',
+                        ])
+                        ->afterStateUpdated(function (Set $set, ?string $state) {
+                            $bgColors = [
+                                'support assistance' => 'bg-sky-800',
+                                'troubleshooting' => 'bg-red-400',
+                                'installation' => 'bg-sky-400',
+                                'update' => 'bg-pink-400',
+                                'technical support' => 'bg-orange-400',
+                                'system management' => 'bg-yellow-400',
+                                'web development' => 'bg-lime-400',
+                                'email account management' => 'bg-green-400',
+                                'backup management' => 'bg-teal-400',
+                                'preventive maintenance' => 'bg-yellow-400',
+                                'printing editing' => 'bg-violet-400',
+                                'desktop publishing' => 'bg-fuchsia-400',
+                                'others' => 'bg-white',
+                            ];
+                    
+                            $textColors = [
+                                'support assistance' => 'text-white',
+                                'troubleshooting' => 'text-black',
+                                'installation' => 'text-white',
+                                'update' => 'text-white',
+                                'technical support' => 'text-black',
+                                'system management' => 'text-black',
+                                'web development' => 'text-black',
+                                'email account management' => 'text-black',
+                                'backup management' => 'text-black',
+                                'preventive maintenance' => 'text-black',
+                                'printing editing' => 'text-white',
+                                'desktop publishing' => 'text-white',
+                                'others' => 'text-sky-600',
+                            ];
+                    
+                            $set('bg_color', $bgColors[$state] ?? 'bg-sky-400');
+                            $set('text_color', $textColors[$state] ?? 'text-black');
+                        })
+                        ->columnSpan(1),
                         DatePicker::make('due_date')
                             ->label('Due Date')
                             ->date('D - M d, Y')
@@ -282,7 +338,17 @@ class AllTasksBoard extends KanbanBoard
 
 
 
-
+                // Actions::make([
+                //     Action::make('delete')
+                //         ->icon('heroicon-m-x-mark')
+                //         ->color('danger')
+                //         ->requiresConfirmation()
+                //         ->action(function () use ($recordId) {
+                //             static::$model::find($recordId)->delete();
+        
+                //             $this->dispatch('close-modal', id: 'kanban--edit-record-modal');
+                //         }),
+                // ]),
 
 
 
@@ -356,9 +422,62 @@ if ($data['progress'] == 100) {
                     Cluster::make([
 
 
-                        TextInput::make('project')
-                            ->label('Project')
-                            ->nullable(),
+                    Select::make('project')
+                        ->label('Type')
+                        ->default('support assistance')
+                        ->live()
+                        ->options([
+                            'support assistance' => 'Support/Assistance',
+                            'troubleshooting' => 'Troubleshooting',
+                            'installation' => 'Installation',
+                            'update' => 'Update',
+                            'technical support' => 'Technical Support',
+                            'system management' => 'System Management',
+                            'web development' => 'Web Development',
+                            'email account management' => 'Email/Account Management',
+                            'backup management' => 'Backup Management',
+                            'preventive maintenance' => 'Preventive Maintenance',
+                            'printing editing' => 'Printing/Editing',
+                            'desktop publishing' => 'Desktop Publishing',
+                            'others' => 'Others',
+                        ])
+                        ->afterStateUpdated(function (Set $set, ?string $state) {
+                            $bgColors = [
+                                'support assistance' => 'bg-sky-800',
+                                'troubleshooting' => 'bg-red-400',
+                                'installation' => 'bg-sky-400',
+                                'update' => 'bg-pink-400',
+                                'technical support' => 'bg-orange-400',
+                                'system management' => 'bg-yellow-400',
+                                'web development' => 'bg-lime-400',
+                                'email account management' => 'bg-green-400',
+                                'backup management' => 'bg-teal-400',
+                                'preventive maintenance' => 'bg-yellow-400',
+                                'printing editing' => 'bg-violet-400',
+                                'desktop publishing' => 'bg-fuchsia-400',
+                                'others' => 'bg-white',
+                            ];
+                    
+                            $textColors = [
+                                'support assistance' => 'text-white',
+                                'troubleshooting' => 'text-black',
+                                'installation' => 'text-white',
+                                'update' => 'text-white',
+                                'technical support' => 'text-black',
+                                'system management' => 'text-black',
+                                'web development' => 'text-black',
+                                'email account management' => 'text-black',
+                                'backup management' => 'text-black',
+                                'preventive maintenance' => 'text-black',
+                                'printing editing' => 'text-white',
+                                'desktop publishing' => 'text-white',
+                                'others' => 'text-sky-600',
+                            ];
+                    
+                            $set('bg_color', $bgColors[$state] ?? 'bg-sky-400');
+                            $set('text_color', $textColors[$state] ?? 'text-white');
+                        })
+                        ->columnSpan(1),
                         DatePicker::make('due_date')
                             ->label('Due Date')
                             ->date('D - M d, Y')
@@ -438,6 +557,8 @@ if ($data['progress'] == 100) {
 
         ];
     }
+    
+    
 
     protected function additionalRecordData(Model $record): Collection
     {
@@ -454,4 +575,5 @@ if ($data['progress'] == 100) {
 
         ]);
     }
+
 }

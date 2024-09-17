@@ -1,3 +1,23 @@
 @import '/vendor/filament/filament/resources/css/theme.css';
 
 @config 'tailwind.config.js';
+
+/* .fi .fi-topbar {
+    @apply bg-gradient-to-br from-sky-200 to-slate-100 dark:bg-slate-500;
+} */
+
+/* .fi-panel-admin {
+    @apply bg-gradient-to-tr from-sky-300 via-slate-50 to-blue-400 dark:bg-slate-950;
+} */
+
+/* .fi-body {
+    @apply bg-gradient-to-tr from-sky-800  to-blue-600 ;
+} */
+
+/* .fi-ta-header {
+    @apply  bg-gradient-to-bl from-sky-600/80 to-sky-600/10 dark:bg-slate-950 ;
+} */
+
+/* .fi-simple-main {
+    @apply  bg-gradient-to-bl from-sky-600/80 via-slate-50 to-sky-600/10 dark:bg-slate-950;
+} */

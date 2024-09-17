@@ -1,30 +1,55 @@
 @props(['record'])
 
-<div id="{{ $record->getKey() }}" wire:click="recordClicked('{{ $record->getKey() }}', {{ @json_encode($record) }})"
+<div id="{{ $record->getKey() }}"
     class="record flex flex-col {{ $record->bg_color }} dark:bg-gray-700 rounded-md p-4 cursor-grab  dark:text-gray-200 border-l-8 shadow-md border-slate-300 
     {{ $record->text_color }} justify-between mb-3"
-    @if ($record->timestamps && now()->diffInSeconds($record->{$record::UPDATED_AT}) < 3) x-data x-init="
+    @if ($record->timestamps && now()->diffInSeconds($record->{$record::UPDATED_AT}) < 3) 
+    x-data 
+    x-init="
             $el.classList.add('animate-pulse-twice', 'bg-primary-100', 'dark:bg-primary-800')
             $el.classList.remove('bg-white', 'dark:bg-gray-700')
             setTimeout(() => {
                 $el.classList.remove('bg-primary-100', 'dark:bg-primary-800')
                 $el.classList.add('{{ $record->bg_color }}', 'dark:bg-gray-700')
-            }, 3000)
-        " @endif>
-       
+            }, 2000)
+        " 
+        @endif>
+
+
     <div class="flex flex-col justify-between mb-2">
 
-        <div class="flex flex-row items-center gap-x-2">
-            @if ($record['urgent'])
-                <x-heroicon-s-star class="top-0 right-0 {{ $record->text_color }} w-5 h-5 inline-block" />
-            @endif
-            <div class="text-balance">
+       
 
-                {{ $record->{static::$recordTitleAttribute} }}
-            </div>
+            <details class="group/sub w-full">
+                <summary class="flex flex-row justify-between list-none cursor-pointer my-auto">
+                    <div class="text-balance">
+                        @if ($record['urgent'])
+                            <x-heroicon-s-star class="top-0 right-0 {{ $record->text_color }} w-5 h-5 inline-block" />
+                        @endif
+                        {{ $record->{static::$recordTitleAttribute} }}
+                    </div>
+
+                    <span class="transition group-open/sub:rotate-180 h-min">
+                        <abbr title="Details">
+                        <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24"
+                            width="24">
+                            <path d="M6 9l6 6 6-6">
+                            </path>
+                        </svg>
+                    </abbr>
+                    </span>
+
+                </summary>
+                <div class="px-2">
+                    <div class="text-xs font-light border-l-2 border-slate-200 pl-2 mb-2">
+                        {{ $record->getTrim() ?? 'No Description' }}
+                    </div>
+                </div>
+            </details>
+       
 
 
-        </div>
         <div class="flex flex-row gap-x-2 my-2">
             <div
                 class="w-8 h-8 rounded-full shadow shadow-gray-400 {{ $record->bg_color }} border-2 border-white pt-[2px] text-center items-center">
@@ -40,18 +65,16 @@
             </div>
         </div>
     </div>
-    <div class=" text-xs font-light border-l-2 border-slate-200 pl-2 mb-2">
-        {{ $record->getTrim() ?? 'No Description' }}
-    </div>
+
 
     <div class="flex flex-row hover:space-x-1 -space-x-2 mb-2 ">
         @foreach ($record['team'] as $member)
             <div
                 class="w-6 h-6 rounded-full shadow shadow-gray-400 {{ $record->bg_color }} border-2 border-white pt-[2px] text-center items-center transition-all ease-in-out group relative">
+            <abbr title="{{ $member->name }}">
                 <span class="text-xs text-center absolute -translate-x-1/2">{{ strtoupper($member->name[0]) }}</span>
-                <span
-                    class="group-hover:opacity-100 transition-opacity bg-slate-300 p-2 text-sm text-slate-600 rounded-md absolute left-1/2 
-            -translate-x-1/2 translate-y-1/3 opacity-0 m-4 mx-auto z-10 block w-[100px]">{{ $member->name }}</span>
+            </abbr>
+                
             </div>
         @endforeach
 
@@ -63,12 +86,32 @@
         <div class="h-1 absolute rounded-full bg-blue-600 " style="width: {{ $record->progress }}%"></div>
     </div>
 
-    <div class="font-light text-xs">
-        Updated {{ $record->updated_at->diffForHumans() }}
-
+    <div class="w-full flex flex-row justify-between items-center">
+        <span class="font-light text-xs float-left">
+            Updated {{ $record->updated_at->diffForHumans() }}
+        </span>
+        <button wire:click="recordClicked('{{ $record->getKey() }}', {{ @json_encode($record) }})"
+            style="width: 20px">
+            <abbr title="Edit Task">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                </svg>
+            </abbr>
+        </button>
+        {{-- <button
+    type="button"
+    wire:click="delete"
+    wire:confirm="Are you sure you want to delete this post?"
+>
+    Delete post 
+</button> --}}
     </div>
 
-    
+
+
+
 
     {{-- <button wire:click="deleteRecord('{{ $record->id }}')" class="delete-btn">Delete</button> --}}
 </div>

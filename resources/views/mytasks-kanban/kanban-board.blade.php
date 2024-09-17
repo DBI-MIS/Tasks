@@ -9,7 +9,7 @@
             @endforeach
         
 
-        <div wire:ignore class=" ">
+        <div wire:ignore>
             @include(static::$scriptsView)
         </div>
     </div>

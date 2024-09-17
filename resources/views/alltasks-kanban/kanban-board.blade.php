@@ -9,14 +9,13 @@
             @endforeach
         
 
-        <div wire:ignore class="">
+        <div wire:ignore>
             @include(static::$scriptsView)
         </div>
     </div>
 </div>
-
     @unless($disableEditModal)
-        <x-filament-kanban::edit-record-modal/>
+        <x-filament-kanban::edit-record-modal />
     @endunless
 </x-filament-panels::page>
 

@@ -15,6 +15,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
+use Filament\Forms\Set;
 use Guava\FilamentClusters\Forms\Cluster;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -50,6 +51,7 @@ class CompletedTaskBoard extends KanbanBoard
     protected static ?string $navigationGroup = 'Board';
     protected static ?string $title = 'My Completed Tasks';
     protected static ?int $navigationSort = 3;
+    protected bool $editModalSlideOver = true;
 
     
 
@@ -164,10 +166,62 @@ class CompletedTaskBoard extends KanbanBoard
                     Cluster::make([
 
 
-                        TextInput::make('project')
-                            ->label('Project')
-                            ->nullable()
-                            ->columnSpan(1),
+                        Select::make('project')
+                        ->label('Type')
+                        ->default('support assistance')
+                        ->live()
+                        ->options([
+                            'support assistance' => 'Support/Assistance',
+                            'troubleshooting' => 'Troubleshooting',
+                            'installation' => 'Installation',
+                            'update' => 'Update',
+                            'technical support' => 'Technical Support',
+                            'system management' => 'System Management',
+                            'web development' => 'Web Development',
+                            'email account management' => 'Email/Account Management',
+                            'backup management' => 'Backup Management',
+                            'preventive maintenance' => 'Preventive Maintenance',
+                            'printing editing' => 'Printing/Editing',
+                            'desktop publishing' => 'Desktop Publishing',
+                            'others' => 'Others',
+                        ])
+                        ->afterStateUpdated(function (Set $set, ?string $state) {
+                            $bgColors = [
+                                'support assistance' => 'bg-sky-800',
+                                'troubleshooting' => 'bg-red-400',
+                                'installation' => 'bg-sky-400',
+                                'update' => 'bg-pink-400',
+                                'technical support' => 'bg-orange-400',
+                                'system management' => 'bg-yellow-400',
+                                'web development' => 'bg-lime-400',
+                                'email account management' => 'bg-green-400',
+                                'backup management' => 'bg-teal-400',
+                                'preventive maintenance' => 'bg-yellow-400',
+                                'printing editing' => 'bg-violet-400',
+                                'desktop publishing' => 'bg-fuchsia-400',
+                                'others' => 'bg-white',
+                            ];
+                    
+                            $textColors = [
+                                'support assistance' => 'text-white',
+                                'troubleshooting' => 'text-black',
+                                'installation' => 'text-white',
+                                'update' => 'text-white',
+                                'technical support' => 'text-black',
+                                'system management' => 'text-black',
+                                'web development' => 'text-black',
+                                'email account management' => 'text-black',
+                                'backup management' => 'text-black',
+                                'preventive maintenance' => 'text-black',
+                                'printing editing' => 'text-white',
+                                'desktop publishing' => 'text-white',
+                                'others' => 'text-sky-600',
+                            ];
+                    
+                            $set('bg_color', $bgColors[$state] ?? 'bg-sky-400');
+                            $set('text_color', $textColors[$state] ?? 'text-white');
+                        })
+                        ->columnSpan(1),
                         DatePicker::make('due_date')
                             ->label('Due Date')
                             ->date('D - M d, Y')

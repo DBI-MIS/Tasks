@@ -1,8 +1,24 @@
 @props(['status'])
 
 <div class="flex-1">
-    {{-- Include the header view --}}
-    @include(static::$headerView)
+    <div wire:loading class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" >
+        <x-filament::loading-indicator class="h-10 w-10 mx-auto z-50" />
+    </div>
+    
+    <details open class="group/main">
+        
+        <summary class="flex flex-row justify-between list-none cursor-pointer my-auto">
+            @include(static::$headerView)
+            <span class="transition group-open/main:rotate-180 text-black h-min">
+                <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor"
+                    stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24"
+                    width="24">
+                    <path d="M6 9l6 6 6-6">
+                    </path>
+        
+                </svg>
+            </span>
+        </summary>
 
     {{-- Conditionally display the dropzone if status count is 0 or null --}}
     @if (empty($status['records']) || count($status['records']) === 0)
@@ -17,4 +33,7 @@
             @include(static::$recordView)
         @endforeach
     </div>
+
+    </details>
+    
 </div>

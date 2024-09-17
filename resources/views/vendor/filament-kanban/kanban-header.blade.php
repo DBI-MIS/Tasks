@@ -2,3 +2,4 @@
     <span class="text-primary-400">❖</span>
     {{ $status['title'] }}
 </h3>
+
