@@ -3,6 +3,7 @@
 <div id="{{ $record->getKey() }}"
     class="record flex flex-col {{ $record->bg_color }} dark:bg-gray-700 rounded-md p-4 cursor-grab  dark:text-gray-200 border-l-8 shadow-md border-slate-300 
     {{ $record->text_color }} justify-between mb-3"
+     
     @if ($record->timestamps && now()->diffInSeconds($record->{$record::UPDATED_AT}) < 3) 
     x-data 
     x-init="

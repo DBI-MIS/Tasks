@@ -60,6 +60,7 @@ class AppServiceProvider extends ServiceProvider
                 <link href="/pwa/icons/ios/512.png" sizes="512x512" rel="apple-touch-startup-image">
                 <link href="/pwa/icons/ios/256.png" sizes="256x256" rel="apple-touch-startup-image">
                 <link href="/pwa/icons/ios/192.png" sizes="192x192" rel="apple-touch-startup-image">
+
             ',
         );
     }

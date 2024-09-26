@@ -1,6 +1,7 @@
 <script>
+    
     function onStart() {
-        setTimeout(() => document.body.classList.add("grabbing"))
+        setTimeout(() => document.body.classList.add("grabbing"), 1000)
     }
 
     function onEnd() {
@@ -28,34 +29,38 @@
         Livewire.dispatch('sort-changed', {recordId, status, orderedIds})
     }
 
+
     document.addEventListener('livewire:navigated', () => {
-        const statuses = @js($statuses->map(fn ($status) => $status['id']));
-    
-        statuses.forEach(status => {
-            const element = document.querySelector(`[data-status-id='${status}']`);
-            const sortableInstance = Sortable.create(element, {
-                group: 'filament-kanban',
-                ghostClass: 'opacity-50',
-                animation: 150,
-                onStart(event) {
-                    // Disable dragging initially
-                    sortableInstance.option('disabled', true);
-    
-                    // Re-enable dragging after 2 seconds
-                    setTimeout(() => {
-                        sortableInstance.option('disabled', false);
-                    }, 1000);
-    
-                    // Call your original onStart function if needed
-                    if (typeof onStart === 'function') {
-                        onStart(event);
-                    }
-                },
-                onEnd,
-                onUpdate,
-                setData,
-                onAdd,
-            });
+    const statuses = @js($statuses->map(fn ($status) => $status['id']));
+
+    if (window.innerWidth < 640) {
+        return; 
+    }
+
+    statuses.forEach(status => {
+        const element = document.querySelector(`[data-status-id='${status}']`);
+        const sortableInstance = Sortable.create(element, {
+            group: 'filament-kanban',
+            ghostClass: 'opacity-50',
+            animation: 150,
+            onStart(event) {
+
+                sortableInstance.option('disabled', true);
+
+                setTimeout(() => {
+                    sortableInstance.option('disabled', false);
+                }, 1000);
+
+                if (typeof onStart === 'function') {
+                    onStart(event);
+                }
+            },
+            onEnd,
+            onUpdate,
+            setData,
+            onAdd,
         });
     });
+});
+
 </script>

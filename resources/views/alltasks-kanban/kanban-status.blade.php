@@ -31,7 +31,7 @@
         @endif
     
         
-    <div data-status-id="{{ $status['id'] }}" class="block gap-x-2 gap-y-3 mb-7 mt-7 my-4 max-w-[300px] sm:max-w-full">
+    <div data-status-id="{{ $status['id'] }}" class="block gap-x-2 gap-y-3 mb-7 mt-7 my-4 sm:max-w-full">
 
         @foreach ($status['records'] as $record)
             @include(static::$recordView)
