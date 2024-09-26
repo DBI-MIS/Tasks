@@ -1,5 +1,9 @@
 const CACHE_NAME = 'v1.0.0';
 
+const OFFLINE_VERSION = 1;
+
+const OFFLINE_URL = "https://task.dbiphils.com/offline.html";
+
 const cacheAssets = [
     '/favicon.ico',
 ];

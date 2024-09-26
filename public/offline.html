@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Offline</title>
+
+    <!-- Inline the page's stylesheet. -->
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html, body {
+        height: 100%;
+      }
+
+      body {
+        font-family: helvetica, arial, sans-serif;
+        background-color: #282F44;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+      }
+
+      div {
+        background-color: #282F44;
+        padding: 2em;
+        border-radius: 10px;
+        text-align: center;
+       
+      }
+
+      h1 {
+        font-style: bold;
+        color: #EEEEFF;
+      }
+
+      p {
+        margin-block: 1rem;
+        color: #EEEEFF;
+      }
+
+      button {
+        display: block;
+        padding: 10px 20px;
+        background-color: #2B4570;
+        color: #EEEEFF;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 1rem auto 0 auto;
+      }
+
+      button:hover {
+        background-color: #9FB4C7;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <h1>Offline</h1>
+      <p>Make sure that you are connected <br> the network with internet.</p>
+      <button type="button">Reload</button>
+    </div>
+
+    <script>
+      document.querySelector("button").addEventListener("click", () => {
+        window.location.reload();
+      });
+
+      window.addEventListener('online', () => {
+        window.location.reload();
+      });
+
+      async function checkNetworkAndReload() {
+        try {
+          const response = await fetch('.');
+          if (response.status >= 200 && response.status < 500) {
+            window.location.reload();
+            return;
+          }
+        } catch {}
+        window.setTimeout(checkNetworkAndReload, 2500);
+      }
+
+      checkNetworkAndReload();
+    </script>
+  </body>
+</html>

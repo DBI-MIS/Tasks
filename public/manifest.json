@@ -4,8 +4,8 @@
     "description": "",
     "start_url": "https://task.dbiphils.com",
     "display": "standalone",
-    "background_color": "#ebeaea",
-    "theme_color": "#f9fafb",
+    "background_color": "#282F44",
+    "theme_color": "#2B4570",
     "orientation": "portrait-primary",
     "icons": [
         {
