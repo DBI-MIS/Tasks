@@ -24,8 +24,9 @@ class AppServiceProvider extends ServiceProvider
         FilamentView::registerRenderHook(
             PanelsRenderHook::HEAD_END,
             fn(): string => '
-                <meta name="apple-mobile-web-app-status-bar" content="#01d679">
+                <meta name="apple-mobile-web-app-status-bar-style" content="black">
                 <meta name="apple-mobile-web-app-capable" content="yes">
+                <meta name="mobile-web-app-capable" content="yes">
                 <link rel="manifest" href="/manifest.json">
 
                  <link rel="apple-touch-icon" sizes="16x16" href="/pwa/icons/ios/16.png">
