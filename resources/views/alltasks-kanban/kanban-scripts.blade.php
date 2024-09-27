@@ -2,6 +2,7 @@
     
     function onStart() {
         setTimeout(() => document.body.classList.add("grabbing"), 1000)
+        
     }
 
     function onEnd() {
