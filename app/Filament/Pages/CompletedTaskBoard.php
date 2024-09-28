@@ -49,7 +49,16 @@ class CompletedTaskBoard extends KanbanBoard
 
     protected static string $statusEnum = CompletedStatus::class;
 
-    protected ?string $subheading = 'Completed Tasks.';
+    public function getSubheading(): ?string
+{
+    $prefix = 'Completed Tasks for ';
+    
+    // Get the current month using now()->format('F')
+    $currentMonth = now()->format('F');
+    
+    // Return the prefix concatenated with the current month
+    return $prefix . $currentMonth;
+}
 
     protected static ?string $navigationGroup = 'Board';
     protected static ?string $title = 'My Completed Tasks';
@@ -72,28 +81,67 @@ class CompletedTaskBoard extends KanbanBoard
     //         ->get();
     // }
 
-    protected function records(): Collection
+    public $startDate;
+    public $endDate;
+
+    protected $rules = [
+        'startDate' => 'nullable|date',
+        'endDate' => 'nullable|date|after_or_equal:startDate',
+    ];
+
+    public function filterByDate()
     {
-        // Get current date and the weekday number (0 for Sunday, 1 for Monday, etc.)
-        $currentDate = Carbon::now();
-        $startOfPeriod = $currentDate->copy()->subDays(30);
-        $endOfPeriod = $currentDate;
-    
-        // Retrieve tasks created from Monday to Friday with status not equal to 'done'
-        // and either belong to a team with the current authenticated user or are directly assigned to the current authenticated user
-        return Task::where(function ($query) use ($startOfPeriod, $endOfPeriod) {
-                $query->where('is_done', '=', 'done')
-                      ->whereBetween('created_at', [$startOfPeriod, $endOfPeriod]);
-            })
-                    
-                    ->where(function ($query) {
-                        $query->whereHas('team', function ($query) {
-                            $query->where('user_id', auth()->id());
-                        })
-                        ->orWhere('user_id', auth()->id());
-                    })
-                    ->get();
+        $this->validate();
     }
+
+    protected function records(): Collection
+{
+    // Get the start of the current month
+    $startOfMonth = Carbon::now()->startOfMonth();
+    // Add 30 days to the start of the month
+    $endOfPeriod = $startOfMonth->copy()->addDays(30);
+
+    // If the user hasn't provided a custom date range, use the default range
+    $startDate = $this->startDate ?? $startOfMonth;
+    $endDate = $this->endDate ?? $endOfPeriod;
+
+    // Default query: filter by 'is_done' and created within the first 30 days of the month
+    $query = Task::where('is_done', 'done')
+                 ->whereBetween('created_at', [$startDate, $endDate]);
+
+    // Additional filtering: tasks that belong to a team or are directly assigned to the user
+    return $query->where(function ($query) {
+                $query->whereHas('team', function ($query) {
+                    $query->where('user_id', auth()->id());
+                })
+                ->orWhere('user_id', auth()->id());
+            })
+            ->get();
+}
+
+
+    // protected function records(): Collection
+    // {
+    //     // Get current date and the weekday number (0 for Sunday, 1 for Monday, etc.)
+    //     $currentDate = Carbon::now();
+    //     $startOfPeriod = $currentDate->copy()->subDays(30);
+    //     $endOfPeriod = $currentDate;
+    
+    //     // Retrieve tasks created from Monday to Friday with status not equal to 'done'
+    //     // and either belong to a team with the current authenticated user or are directly assigned to the current authenticated user
+    //     return Task::where(function ($query) use ($startOfPeriod, $endOfPeriod) {
+    //             $query->where('is_done', '=', 'done')
+    //                   ->whereBetween('created_at', [$startOfPeriod, $endOfPeriod]);
+    //         })
+                    
+    //                 ->where(function ($query) {
+    //                     $query->whereHas('team', function ($query) {
+    //                         $query->where('user_id', auth()->id());
+    //                     })
+    //                     ->orWhere('user_id', auth()->id());
+    //                 })
+    //                 ->get();
+    // }
 
     public function onStatusChanged(int $recordId, string $status, array $fromOrderedIds, array $toOrderedIds): void
     {
@@ -294,67 +342,7 @@ class CompletedTaskBoard extends KanbanBoard
         ]);
     }
 
-    // protected function getHeaderActions(): array
-    // {
-    //     return [
-    //         CreateAction::make()
-    //             ->model(Task::class)
-    //             ->form([
-    //                 Toggle::make('urgent')
-    //                     ->required(),
-    //                 Cluster::make([
-    //                     TextInput::make('title')
-    //                         ->label('Task Name')
-    //                         ->required()
-    //                         ->columnSpan(1),
-    //                     Textarea::make('description')
-    //                         ->required()
-    //                         ->rows('3')
-    //                         ->columnSpan(2),
-    //                 ])
-    //                     ->label('Task Name')
-    //                     ->hint('')
-    //                     ->helperText('*Description)->columns(1),
-
-    //                 Cluster::make([
-
-
-    //                     TextInput::make('project')
-    //                         ->label('Project')
-    //                         ->nullable(),
-    //                     DatePicker::make('due_date')
-    //                         ->label('Due Date')
-    //                         ->date('D - M d, Y')
-    //                         ->nullable(),
-
-    //                 ])
-    //                     ->label('Project')
-    //                     ->hint('Due Date')
-    //                     ->columns(2),
-
-    //                 Cluster::make([
-    //                     Select::make('user_id')
-    //                         ->default(auth()->id())
-    //                         ->relationship('user', 'name')
-    //                         ->required()
-    //                         ->columnSpan(1),
-    //                     Select::make('team')
-    //                         ->label('Assigned User')
-    //                         ->relationship('team', 'name')
-    //                         ->multiple()
-    //                         ->nullable()
-    //                         ->searchable()
-    //                         ->preload()
-    //                         ->columnSpan(2),
-    //                 ])
-    //                     ->label('User')
-    //                     ->hint('Assigned User/s')
-    //                     ->helperText(' ')->columns(3),
-
-
-    //             ]),
-    //     ];
-    // }
+    
 
     protected function additionalRecordData(Model $record): Collection
     {
