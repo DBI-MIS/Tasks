@@ -90,7 +90,8 @@
     <div class="w-full flex flex-row justify-between items-center">
         <span class="font-light text-xs float-left">
             Updated {{ $record->updated_at->diffForHumans() }}
-        </span> <div class="flex gap-2">
+        </span> 
+        <div class="flex gap-2">
             <button wire:click="recordClicked('{{ $record->getKey() }}', {{ @json_encode($record) }})"
                 style="width: 20px">
                 <abbr title="Edit Task">
@@ -114,11 +115,8 @@
             </abbr>
             </button>
             </div>
+
+        
     </div>
 
-
-
-
-
-    {{-- <button wire:click="deleteRecord('{{ $record->id }}')" class="delete-btn">Delete</button> --}}
 </div>

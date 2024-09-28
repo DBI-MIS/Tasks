@@ -1,5 +1,5 @@
 <div x-data="{ state: $wire.$entangle('{{ $getStatePath() }}') }" class="flex items-center gap-2 w-full">
-    <div class="flex flex-col items-center">
+    <div class="flex flex-col items-center w-full">
      <span class="text-xs mb-2">Progress<span x-text="' '+ state + '%'"></span></span>
     <input 
         type="range" 
@@ -7,7 +7,7 @@
         min="1" 
         max="100"
         class="h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-900"
-        :style="'background: linear-gradient(to right, #3b82f6 ' + state + '%, #e5e7eb ' + state + '%); min-width: 290px;'"
+        :style="'background: linear-gradient(to right, #3b82f6 ' + state + '%, #e5e7eb ' + state + '%);  width: 100%'"
         
         
     />

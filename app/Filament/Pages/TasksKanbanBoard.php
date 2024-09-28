@@ -8,6 +8,7 @@ use App\Models\Task;
 use App\Models\User;
 use Carbon\Carbon;
 use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
@@ -139,31 +140,23 @@ class TasksKanbanBoard extends KanbanBoard
                         ->required()
                         ->columnSpan(1),
 
-                        ViewField::make('progress')
+                    ViewField::make('progress')
                         ->view('filament.forms.components.range-slider')
                         ->viewData([
                             'min' => 1,
                             'max' => 100,
                         ])
-                        ->registerActions([
-                            Action::make('setDone')
-                                ->icon('heroicon-m-check-circle')
-                                ->iconButton()
-                                ->action(function (Set $set) {
-                                    $set('progress', 100);
-                                }),
-                        ])
-                        ->columnSpanFull(),
+                        ->columnSpan(3),
 
                     Cluster::make([
                         TextInput::make('title')
                             ->label('Task Name')
                             ->autocapitalize('words')
                             ->required()
-                            ->columnSpan(2),
+                            ->columnSpan(3),
                         Textarea::make('description')
-                            ->rows('3')
-                            ->columnSpan(2),
+                            ->rows('4')
+                            ->columnSpan(3),
                     ])
                         ->label('Task Name')
                         ->hint('')
@@ -256,49 +249,6 @@ class TasksKanbanBoard extends KanbanBoard
                         ->label('User')
                         ->hint('Assigned User/s')
                         ->helperText(' ')->columnSpan(3),
-                        Cluster::make([
-                            Select::make('text_color')
-                                    ->default('text-white')
-                                    ->required()
-                                    ->options([
-                                        'text-white' => 'white',
-                                        'text-black' => 'black',
-                                        'text-yellow-400' => 'yellow',
-                                        'text-red-600' => 'red',
-                                        'text-sky-600' => 'blue',
-                                        'text-lime-600' => 'green',
-                                    ])
-                                    ->label(__('Text Color'))
-                                    ->columnSpan(1),
-
-                                Select::make('bg_color')
-                                    ->default('bg-sky-400')
-                                    ->required()
-                                    ->options([
-                                        'bg-white' => 'white',
-                                        'bg-black' => 'black',
-                                        'bg-sky-400' => 'blue',
-                                        'bg-sky-800' => 'dark blue',
-                                        'bg-red-400' => 'red',
-                                        'bg-orange-400' => 'orange',
-                                        'bg-yellow-400' => 'yellow',
-                                        'bg-lime-400' => 'lime',
-                                        'bg-green-400' => 'green',
-                                        'bg-teal-400' => 'teal',
-                                        'bg-cyan-400' => 'cyan',
-                                        'bg-violet-400' => 'violet',
-                                        'bg-fuchsia-400' => 'fucshia',
-                                        'bg-pink-400' => 'pink',
-                                        'bg-rose-400' => 'rose',
-                                    ])
-                                    
-                                    ->label(__('Background Color'))
-                                    ->columnSpan(1),
-                                    
-                        ])
-                            ->label('Customization - Text Color | BG Color')
-                            ->hint('Default is White Text & Blue Background')
-                            ->helperText(' ')->columnSpan(3),
 
                             Hidden::make('text_color')
                             ->default('text-white'),
@@ -470,10 +420,10 @@ if ($data['progress'] == 100) {
                     Hidden::make('bg_color')
                         ->default('bg-sky-400'),
                       
-
-
                 ]),
         ];
+
+       
     }
 
     protected function additionalRecordData(Model $record): Collection

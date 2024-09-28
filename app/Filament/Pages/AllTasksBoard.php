@@ -73,7 +73,7 @@ class AllTasksBoard extends KanbanBoard implements HasActions
 
     protected static ?string $navigationIcon = 'heroicon-s-clipboard-document-list';
 
-    protected ?string $subheading = 'Task with star is urgent';
+    // protected ?string $subheading = 'Task with star is urgent';
 
     // protected static string $recordStatusAttribute = 'status';
 
@@ -185,26 +185,19 @@ class AllTasksBoard extends KanbanBoard implements HasActions
                         ->viewData([
                             'min' => 1,
                             'max' => 100,
+                        
                         ])
-                        ->registerActions([
-                            Action::make('setDone')
-                                ->icon('heroicon-m-check-circle')
-                                ->iconButton()
-                                ->action(function (Set $set) {
-                                    $set('progress', 100);
-                                }),
-                        ])
-                        ->columnSpanFull(),
+                        ->columnSpan(3),
 
                     Cluster::make([
                         TextInput::make('title')
                             ->label('Task Name')
                             ->autocapitalize('words')
                             ->required()
-                            ->columnSpan(2),
+                            ->columnSpan(3),
                         Textarea::make('description')
-                            ->rows('3')
-                            ->columnSpan(2),
+                            ->rows('4')
+                            ->columnSpan(3),
                     ])
                         ->label('Task Name')
                         ->hint('')

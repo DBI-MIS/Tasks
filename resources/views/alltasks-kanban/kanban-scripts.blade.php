@@ -73,4 +73,20 @@
     });
 });
 
+function hideElement(status) {
+    const visibleElement = document.getElementById(status);
+    visibleElement.classList.add('hidden');
+    const textnode = `<span class="flex items-center" id="hidden_`+ status +`" x-on:click="showElement('`+ status +`');">
+                @svg('heroicon-o-eye', ['class' => 'text-`+ color +` w-5 h-5']) <span class="pl-1 text-`+ color +`">`+ title +`</span>
+        </span>`;
+    document.getElementById("hiddenItems")
+      .innerHTML += textnode;
+  }
+  function showElement(status) {
+    const hiddenElement = document.getElementById(status);
+    hiddenElement.classList.remove('hidden');
+    const removeHidden = document.getElementById('hidden_' + status);
+    removeHidden.remove();
+  }
+
 </script>

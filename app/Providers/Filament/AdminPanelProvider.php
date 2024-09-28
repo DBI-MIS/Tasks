@@ -38,6 +38,7 @@ class AdminPanelProvider extends PanelProvider
             ->spa()
             ->font('Poppins')
             ->maxContentWidth(MaxWidth::Full)
+            ->sidebarWidth('15rem')
             ->colors([
                 'primary' => Color::hex('#36c'),
                 'danger' => Color::Red,

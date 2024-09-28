@@ -54,13 +54,5 @@
         </details>
 
 
-
-        
-
-       
-       {{-- <x-filament::actions
-       :actions="$this->getHeaderActions()"/>
-        --}}
-
-
 </div>
+

@@ -30,7 +30,7 @@
             @endif
         </div>
         
-        <div class="text-lg">
+        <div class="text-md ">
             
             {{ $record->{static::$recordTitleAttribute} }}
 
