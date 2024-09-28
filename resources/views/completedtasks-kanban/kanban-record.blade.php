@@ -1,9 +1,10 @@
 @props(['record'])
 
 <div id="{{ $record->getKey() }}"
-    class="record flex flex-col {{ $record->bg_color }} dark:bg-gray-700 rounded-md p-4 cursor-grab  dark:text-gray-200 border-l-8 shadow-md border-slate-300 
+    class="record flex flex-col {{ $record->bg_color }} dark:{{ $record->bg_color }} rounded-md p-4 cursor-grab  dark:text-gray-800 border-l-8 shadow-md border-slate-300 
     {{ $record->text_color }} justify-between
-    min-w-[200px] min-h-[180px] max-w-[380px] max-h-[240px] flex-1"
+    min-h-[100px] w-full"
+    style="max-width: 380px;"
     @if ($record->timestamps && now()->diffInSeconds($record->{$record::UPDATED_AT}) < 3) 
     x-data 
     x-init="
@@ -11,14 +12,14 @@
             $el.classList.remove('bg-white', 'dark:bg-gray-700')
             setTimeout(() => {
                 $el.classList.remove('bg-primary-100', 'dark:bg-primary-800')
-                $el.classList.add('{{ $record->bg_color }}', 'dark:bg-gray-700')
+                $el.classList.add('{{ $record->bg_color }}', 'dark:{{ $record->bg_color }}')
             }, 3000)
         " 
         @endif>
 
-    <div class="flex flex-col justify-between mb-2">
-        <div class="flex flex-row justify-between mb-2">
-            <div class="font-light text-xs {{ $record->text_color }}">
+    <div class="flex flex-col justify-between mb-2 w-full">
+        <div class="flex flex-row justify-between mb-2 items-center">
+            <div class="font-light text-[10px] {{ $record->text_color }}">
                 Created {{ $record->created_at->diffForHumans() }}
                 </div>
                 @if ($record['urgent'])
@@ -29,7 +30,7 @@
             @endif
         </div>
         
-        <div>
+        <div class="text-lg">
             
             {{ $record->{static::$recordTitleAttribute} }}
 
@@ -38,7 +39,7 @@
 
 </div>
 
-    <div class="flex flex-row hover:space-x-1 -space-x-2 mt-1 mb-2 ">
+    {{-- <div class="flex flex-row hover:space-x-1 -space-x-2 mt-1 mb-2 ">
         
         @foreach ($record['team'] as $member)
         <div
@@ -51,7 +52,7 @@
     @endforeach
 
 
-    </div>
+    </div> --}}
     {{-- <span class="text-xs font-light"> {{ $record->progress }}% Progress</span>
     <div class="h-3 w-full relative mb-2">
         <div class="h-1 bg-gray-200 rounded-full absolute w-full"></div>
@@ -59,7 +60,7 @@
     </div> --}}
 
     <div class="w-full flex flex-row justify-between items-center">
-        <span class="font-light text-xs float-left">
+        <span class="font-light text-[10px] float-left">
             Updated {{ $record->updated_at->diffForHumans() }}
         </span>
         <button wire:click="recordClicked('{{ $record->getKey() }}', {{ @json_encode($record) }})"

@@ -72,20 +72,20 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
-                FilamentGeneralSettingsPlugin::make()
-                    ->canAccess(fn() => auth()->user()->role === 'ADMIN')
-                    ->setSort(3)
-                    ->setIcon('heroicon-o-cog')
-                    ->setNavigationGroup('Settings')
-                    ->setTitle('General Settings')
-                    ->setNavigationLabel('General Settings'),
-                FilamentBackgroundsPlugin::make()
-                ->showAttribution(false)
-                ->remember(300)
-                ->imageProvider(
-                    MyImages::make()
-                        ->directory('images/backgrounds')
-                ),
+                // FilamentGeneralSettingsPlugin::make()
+                //     ->canAccess(fn() => auth()->user()->role === 'ADMIN')
+                //     ->setSort(3)
+                //     ->setIcon('heroicon-o-cog')
+                //     ->setNavigationGroup('Settings')
+                //     ->setTitle('General Settings')
+                //     ->setNavigationLabel('General Settings'),
+                // FilamentBackgroundsPlugin::make()
+                // ->showAttribution(false)
+                // ->remember(300)
+                // ->imageProvider(
+                //     MyImages::make()
+                //         ->directory('images/backgrounds')
+                // ),
                 ])
                 
                 ;

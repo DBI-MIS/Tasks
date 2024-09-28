@@ -9,6 +9,7 @@ export default {
     './resources/views/mynotes-kanban/**/*.blade.php',
     './resources/views/vendor/**/*.blade.php',
     './vendor/filament/**/*.blade.php',
+    './vendor/filament/forms/components/*.blade.php',
     './vendor/jaocero/radio-deck/resources/views/**/*.blade.php',
   ],
   theme: {

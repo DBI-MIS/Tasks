@@ -10,7 +10,6 @@ enum NotesPin: string
 
     case Pinned = 'pinned';
     case Note = 'note';
-    case Delete = 'deleted';
 
     public static function kanbanCases(): array
     {

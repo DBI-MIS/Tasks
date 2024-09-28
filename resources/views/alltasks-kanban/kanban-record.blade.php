@@ -1,7 +1,7 @@
 @props(['record'])
 
 <div id="{{ $record->getKey() }}"
-    class="record flex flex-col {{ $record->bg_color }} dark:bg-gray-700 rounded-md p-4 cursor-grab  dark:text-gray-200 border-l-8 shadow-md border-slate-300 
+    class="record flex flex-col {{ $record->bg_color }} dark:{{ $record->bg_color }} rounded-md p-4 cursor-grab  dark:text-gray-800 border-l-8 shadow-md border-slate-300 
     {{ $record->text_color }} justify-between mb-3"
      
     @if ($record->timestamps && now()->diffInSeconds($record->{$record::UPDATED_AT}) < 3) 
@@ -11,7 +11,7 @@
             $el.classList.remove('bg-white', 'dark:bg-gray-700')
             setTimeout(() => {
                 $el.classList.remove('bg-primary-100', 'dark:bg-primary-800')
-                $el.classList.add('{{ $record->bg_color }}', 'dark:bg-gray-700')
+                $el.classList.add('{{ $record->bg_color }}', 'dark:{{ $record->bg_color }}')
             }, 2000)
         " 
         @endif>
@@ -91,6 +91,8 @@
         <span class="font-light text-xs float-left">
             Updated {{ $record->updated_at->diffForHumans() }}
         </span>
+        
+        <div class="flex gap-2">
         <button wire:click="recordClicked('{{ $record->getKey() }}', {{ @json_encode($record) }})"
             style="width: 20px">
             <abbr title="Edit Task">
@@ -101,18 +103,23 @@
                 </svg>
             </abbr>
         </button>
-        {{-- <button
-    type="button"
-    wire:click="delete"
-    wire:confirm="Are you sure you want to delete this post?"
->
-    Delete post 
-</button> --}}
+        <button 
+        wire:click="deleteRecord({{ $record->id }})" 
+        style="width: 20px"
+        wire:confirm="Are you sure you want to delete this task?">
+        <abbr title="Delete Task">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" 
+            stroke="currentColor" >
+  <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+</svg>
+
+        </abbr>
+        </button>
+        </div>
     </div>
 
 
 
 
 
-    {{-- <button wire:click="deleteRecord('{{ $record->id }}')" class="delete-btn">Delete</button> --}}
 </div>

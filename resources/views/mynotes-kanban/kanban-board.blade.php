@@ -1,12 +1,12 @@
 <x-filament-panels::page>
-    <span class="text-slate-200 text-[12px]">Drag Above to Pin</span>
+    <span class="text-slate-200 text-[12px] hidden sm:block">Drag Above to Pin</span>
     <div class="">
     <div x-data wire:ignore.self >
             @foreach($statuses as $status)
       
 
             @include(static::$statusView)
-            <hr>
+            
             @endforeach
         
 

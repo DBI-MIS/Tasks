@@ -8,8 +8,10 @@ use App\Models\Task;
 use App\Models\User;
 use Carbon\Carbon;
 use Filament\Actions\CreateAction;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -20,6 +22,8 @@ use Filament\Forms\Components\ViewField;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Http\Middleware\Authenticate;
+use Filament\Notifications\Notification;
+use Filament\Support\Enums\ActionSize;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\IconPosition;
 use Filament\Support\Enums\IconSize;
@@ -133,16 +137,23 @@ class TasksKanbanBoard extends KanbanBoard
                 ->schema([
                     Toggle::make('urgent')
                         ->required()
-                        ->columnSpan(3),
+                        ->columnSpan(1),
 
-                    TextInput::make('progress')
-                        ->label('')
-                        ->prefix('Progress')
-                        ->numeric()
-                        ->maxValue(100)
-                        ->minValue(-1)
-                        ->suffix('%')
-                        ->columnSpan(3),
+                        ViewField::make('progress')
+                        ->view('filament.forms.components.range-slider')
+                        ->viewData([
+                            'min' => 1,
+                            'max' => 100,
+                        ])
+                        ->registerActions([
+                            Action::make('setDone')
+                                ->icon('heroicon-m-check-circle')
+                                ->iconButton()
+                                ->action(function (Set $set) {
+                                    $set('progress', 100);
+                                }),
+                        ])
+                        ->columnSpanFull(),
 
                     Cluster::make([
                         TextInput::make('title')
@@ -223,7 +234,7 @@ class TasksKanbanBoard extends KanbanBoard
                             ->default(Carbon::now())
                             ->nullable()->columnSpan(1),
                     ])
-                        ->label('Project')
+                        ->label('Type')
                         ->hint('Due Date')
                         ->columnSpan(3),
 
@@ -288,23 +299,11 @@ class TasksKanbanBoard extends KanbanBoard
                             ->label('Customization - Text Color | BG Color')
                             ->hint('Default is White Text & Blue Background')
                             ->helperText(' ')->columnSpan(3),
-                            // ToggleButtons::make('status')
-                            // ->label('Set')->inline()->grouped()
-                            // ->live()
-                            // ->options([
-                            //     'todo' => 'Back to Todo',
-                            //     'ongoing' => 'On-Going',
-                            //     'review' => 'For Review',
-                            //     'done' => 'Done',
-                            //     'deleted' => 'Delete',
-                            // ])
-                            // ->colors([
-                            //     'todo' => 'info',
-                            //     'ongoing' => 'warning',
-                            //     'review' => 'success',
-                            //     'done' => 'success',
-                            //     'deleted' => 'danger',
-                            // ])
+
+                            Hidden::make('text_color')
+                            ->default('text-white'),
+                        Hidden::make('bg_color')
+                            ->default('bg-sky-400'),
 
                 ])->columns(3),
         ];
@@ -355,8 +354,11 @@ if ($data['progress'] == 100) {
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()
+            CreateAction::make('task')
                 ->model(Task::class)
+                ->button()
+                ->size(ActionSize::Large)
+                ->icon('heroicon-m-plus-circle')
                 ->form([
                     Toggle::make('urgent')
                         ->required(),
@@ -440,7 +442,7 @@ if ($data['progress'] == 100) {
                             ->nullable(),
 
                     ])
-                        ->label('Project')
+                        ->label('Type')
                         ->hint('Due Date')
                         ->columns(2),
 
@@ -462,46 +464,12 @@ if ($data['progress'] == 100) {
                         ->label('User')
                         ->hint('Assigned User/s')
                         ->helperText(' ')->columns(3),
-                        Cluster::make([
-                            Select::make('text_color')
-                                    ->default('text-white')
-                                    ->required()
-                                    ->options([
-                                        'text-white' => 'white',
-                                        'text-black' => 'black',
-                                        'text-yellow-400' => 'yellow',
-                                        'text-red-600' => 'red',
-                                        'text-sky-600' => 'blue',
-                                        'text-lime-600' => 'green',
-                                    ])
-                                    ->label(__('Text Color')),
 
-                                Select::make('bg_color')
-                                    ->default('bg-sky-400')
-                                    ->required()
-                                    ->options([
-                                        'bg-white' => 'white',
-                                        'bg-black' => 'black',
-                                        'bg-sky-400' => 'blue',
-                                        'bg-sky-800' => 'dark blue',
-                                        'bg-red-400' => 'red',
-                                        'bg-orange-400' => 'orange',
-                                        'bg-yellow-400' => 'yellow',
-                                        'bg-lime-400' => 'lime',
-                                        'bg-green-400' => 'green',
-                                        'bg-teal-400' => 'teal',
-                                        'bg-cyan-400' => 'cyan',
-                                        'bg-violet-400' => 'violet',
-                                        'bg-fuchsia-400' => 'fucshia',
-                                        'bg-pink-400' => 'pink',
-                                        'bg-rose-400' => 'rose',
-                                    ])
-                                    
-                                    ->label(__('Background Color')),
-                        ])
-                            ->label('Customization - Text Color | BG Color')
-                            ->hint('Default is White Text & Blue Background')
-                            ->helperText(' ')->columns(2),
+                        Hidden::make('text_color')
+                        ->default('text-white'),
+                    Hidden::make('bg_color')
+                        ->default('bg-sky-400'),
+                      
 
 
                 ]),
@@ -521,4 +489,14 @@ if ($data['progress'] == 100) {
 
         ]);
     }
+
+    public function deleteRecord(int $recordId)
+{
+    Task::find($recordId)->delete();
+
+    Notification::make()
+    ->title('Deleted successfully')
+    ->success()
+    ->send();
+}
 }

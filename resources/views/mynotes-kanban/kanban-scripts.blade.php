@@ -2,6 +2,7 @@
     
     function onStart() {
         setTimeout(() => document.body.classList.add("grabbing"), 1000)
+        
     }
 
     function onEnd() {
@@ -20,6 +21,14 @@
 
         Livewire.dispatch('status-changed', {recordId, status, fromOrderedIds, toOrderedIds})
     }
+
+
+    function onDelete(e) {
+    const recordId = e.item.id;
+
+    Livewire.dispatch('delete-record', {recordId});
+}
+
 
     function onUpdate(e) {
         const recordId = e.item.id
@@ -59,6 +68,7 @@
             onUpdate,
             setData,
             onAdd,
+            onDelete,
         });
     });
 });

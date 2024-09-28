@@ -22,6 +22,14 @@
         Livewire.dispatch('status-changed', {recordId, status, fromOrderedIds, toOrderedIds})
     }
 
+
+    function onDelete(e) {
+    const recordId = e.item.id;
+
+    Livewire.dispatch('delete-record', {recordId});
+}
+
+
     function onUpdate(e) {
         const recordId = e.item.id
         const status = e.from.dataset.statusId
@@ -60,6 +68,7 @@
             onUpdate,
             setData,
             onAdd,
+            onDelete,
         });
     });
 });

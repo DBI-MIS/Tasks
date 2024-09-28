@@ -40,6 +40,7 @@ class Task extends Model implements Sortable
         'teams' => 'collection',
         'updated_at' => 'datetime:m-d-Y h:i A',
         'created_at' => 'datetime:m-d-Y h:i A',
+        'urgent' => 'boolean'
 
     ];
     public function user_tasks()

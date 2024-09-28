@@ -19,15 +19,29 @@
             </svg>
         </span>
     </summary>
+        
     
         @if (empty($status['records']) || count($status['records']) === 0)
             {{-- <div class="border-b-2 border-dotted text-center h-auto text-slate-200 p-2">Drop Task Below Here</div> --}}
 
 
-            <div class="border-b-2 border-dotted text-center h-auto text-slate-200 p-2">
+            <div class="hidden sm:block border-b-2 border-dotted text-center h-auto text-slate-200 p-2">
                 Drop Task Below Here
                 
             </div>
+            <div class="w-full text-center py-2">
+            <button
+        wire:click="mountAction('task')"
+        style="width: 20px"
+        class="hover:text-blue-800 text-slate-400"
+        <abbr title="Create Task">
+           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+
+        </abbr>
+        </button>
+    </div>
         @endif
     
         
@@ -38,4 +52,15 @@
         @endforeach
     </div>
         </details>
+
+
+
+        
+
+       
+       {{-- <x-filament::actions
+       :actions="$this->getHeaderActions()"/>
+        --}}
+
+
 </div>

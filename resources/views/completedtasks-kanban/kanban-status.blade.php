@@ -11,7 +11,7 @@
     <summary class="flex flex-row justify-between list-none cursor-pointer">
         @include(static::$headerView)
         @if (empty($status['records']) || count($status['records']) === 0)
-            <div class="border-b-2 border-dotted text-center h-auto text-slate-200 p-2 min-h-4  w-full">Drag Below</div>
+            <div class="border-b-2 border-dotted text-center h-auto text-slate-200 p-2 min-h-4 w-full hidden sm:block">Drag Below</div>
         @endif
         <span class="transition group-open/main:rotate-180 text-black">
             <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor"
@@ -29,7 +29,7 @@
 
     <div
 data-status-id="{{ $status['id'] }}"
-class="flex flex-wrap gap-y-3 my-4 gap-x-2 sm:max-w-full" 
+class="flex flex-wrap flex-row gap-2" 
 >
 
 

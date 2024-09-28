@@ -8,13 +8,16 @@ use App\TaskStatus;
 use App\Models\Task;
 use Carbon\Carbon;
 use Filament\Actions\CreateAction;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
+use Filament\Forms\Components\ViewField;
 use Filament\Forms\Set;
 use Guava\FilamentClusters\Forms\Cluster;
 use Illuminate\Database\Eloquent\Collection;
@@ -137,17 +140,24 @@ class CompletedTaskBoard extends KanbanBoard
                 ->schema([
 
                     Toggle::make('urgent')
-                        ->required()
-                        ->columnSpan(3),
+                    ->required()
+                    ->columnSpan(1),
 
-                    TextInput::make('progress')
-                        ->label('')
-                        ->prefix('Progress')
-                        ->numeric()
-                        ->maxValue(100)
-                        ->minValue(0)
-                        ->suffix('%')
-                        ->columnSpan(3),
+                    ViewField::make('progress')
+                    ->view('filament.forms.components.range-slider')
+                    ->viewData([
+                        'min' => 1,
+                        'max' => 100,
+                    ])
+                    ->registerActions([
+                        Action::make('setDone')
+                            ->icon('heroicon-m-check-circle')
+                            ->iconButton()
+                            ->action(function (Set $set) {
+                                $set('progress', 100);
+                            }),
+                    ])
+                    ->columnSpanFull(),
 
                     Cluster::make([
                         TextInput::make('title')
@@ -249,57 +259,10 @@ class CompletedTaskBoard extends KanbanBoard
                         ->label('User')
                         ->hint('Assigned User/s')
                         ->helperText(' ')->columnSpan(3),
-                        Cluster::make([
-                            Select::make('text_color')
-                                    ->default('text-white')
-                                    ->required()
-                                    ->options([
-                                        'text-white' => 'white',
-                                        'text-black' => 'black',
-                                        'text-yellow-400' => 'yellow',
-                                        'text-red-600' => 'red',
-                                        'text-sky-600' => 'blue',
-                                        'text-lime-600' => 'green',
-                                    ])
-                                    ->label(__('Text Color'))
-                                    ->columnSpan(1),
-
-                                Select::make('bg_color')
-                                    ->default('bg-sky-400')
-                                    ->required()
-                                    ->options([
-                                        'bg-white' => 'white',
-                                        'bg-black' => 'black',
-                                        'bg-sky-400' => 'blue',
-                                        'bg-sky-800' => 'dark blue',
-                                        'bg-red-400' => 'red',
-                                        'bg-orange-400' => 'orange',
-                                        'bg-yellow-400' => 'yellow',
-                                        'bg-lime-400' => 'lime',
-                                        'bg-green-400' => 'green',
-                                        'bg-teal-400' => 'teal',
-                                        'bg-cyan-400' => 'cyan',
-                                        'bg-violet-400' => 'violet',
-                                        'bg-fuchsia-400' => 'fucshia',
-                                        'bg-pink-400' => 'pink',
-                                        'bg-rose-400' => 'rose',
-                                    ])
-                                    
-                                    ->label(__('Background Color'))
-                                    ->columnSpan(1),
-                        ])
-                            ->label('Customization - Text Color | BG Color')
-                            ->hint('Default is White Text & Blue Background')
-                            ->helperText(' ')->columnSpan(3),
-                            ToggleButtons::make('is_done')
-                            ->label(' ')->inline()->grouped()
-                            ->options([
-                                'deleted' => 'Delete',
-                            ])
-                            ->colors([
-                               
-                                'deleted' => 'danger',
-                            ])
+                        Hidden::make('text_color')
+                        ->default('text-white'),
+                    Hidden::make('bg_color')
+                        ->default('bg-sky-400'),
                             
 
                 ])->columns(3),

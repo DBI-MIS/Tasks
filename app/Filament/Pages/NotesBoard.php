@@ -14,6 +14,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Mokhosh\FilamentKanban\Pages\KanbanBoard;
@@ -102,12 +103,10 @@ class NotesBoard extends KanbanBoard
                             ->options([
                                 'pinned' => 'Yes',
                                 'note' => 'No',
-                                'deleted' => 'Delete',
-                            ])
+                                                            ])
                             ->colors([
                                 'pinned' => 'success',
                                 'note' => 'warning',
-                                'deleted' => 'danger',
                             ])
 
 
@@ -293,4 +292,15 @@ class NotesBoard extends KanbanBoard
 
         ]);
     }
+
+    
+public function deleteRecord(int $recordId)
+{
+    Note::find($recordId)->delete();
+
+    Notification::make()
+    ->title('Deleted successfully')
+    ->success()
+    ->send();
+}
 }
