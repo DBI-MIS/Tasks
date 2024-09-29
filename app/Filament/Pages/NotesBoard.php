@@ -45,11 +45,23 @@ class NotesBoard extends KanbanBoard
 
     protected static string $scriptsView = 'mynotes-kanban.kanban-scripts';
 
+    protected string $editModalTitle = 'Edit Note';
+
+    protected string $editModalSaveButtonLabel = 'Update';
+
+    protected string $editModalCancelButtonLabel = 'Cancel';
+
+    protected bool $editModalSlideOver = false;
+
 
     protected function records(): Collection
     {
 
-        return Note::ordered()->where('user_id', auth()->id())->get();
+        return Note::ordered()
+        ->where('user_id', auth()->id())
+        ->orderBy('created_at', 'desc')
+        ->orderBy('updated_at', 'desc')
+        ->get();
     }
 
     public function onStatusChanged(int $recordId, string $status, array $fromOrderedIds, array $toOrderedIds): void

@@ -5,12 +5,13 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasAvatar
 {
     use HasFactory, Notifiable;
 
@@ -53,7 +54,9 @@ class User extends Authenticatable implements FilamentUser
         'email',
         'password',
         'status',
-        'role'
+        'role',
+        'department',
+        'profile_photo_path',
     ];
 
     // protected $appends = [
@@ -96,4 +99,11 @@ class User extends Authenticatable implements FilamentUser
             static::$ignoreTimestampsOn = array_values(array_diff(static::$ignoreTimestampsOn, [static::class]));
         }
     }
+
+    public function getFilamentAvatarUrl(): ?string
+{
+    return $this->profile_photo_path 
+        ? asset('storage/' . $this->profile_photo_path) 
+        : null;
+}
 }

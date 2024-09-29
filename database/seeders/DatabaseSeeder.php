@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@admin.com',
             'password' => Hash::make('password'),
             'role' => 'ADMIN',
+            'department' => 'MIS',
+            'status' => 'active',
         ]);
 
         // $users = User::factory(50)->create();

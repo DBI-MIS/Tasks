@@ -40,7 +40,7 @@
 
 <div class="flex gap-2 justify-end">
     <button wire:click="recordClicked('{{ $record->getKey() }}', {{ @json_encode($record) }})"
-        style="width: 20px">
+        class="w-6">
         <abbr title="Edit Task">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor">
@@ -51,7 +51,7 @@
     </button>
     <button 
     wire:click="deleteRecord({{ $record->id }})" 
-    style="width: 20px"
+    class="w-6"
     wire:confirm="Are you sure you want to delete this Note?">
     <abbr title="Delete Note">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" 

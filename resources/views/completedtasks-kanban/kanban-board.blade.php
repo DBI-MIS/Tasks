@@ -3,7 +3,7 @@
 <div class="mb-4">
     
     <form wire:submit.prevent="filterByDate">
-        <div class="flex justify-end space-x-4 flex-col sm:flex-row">
+        <div class="flex justify-end space-x-0 sm:space-x-4 flex-col sm:flex-row">
             
             <div>
                 <x-filament::input

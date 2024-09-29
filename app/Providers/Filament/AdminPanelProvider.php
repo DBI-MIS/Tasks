@@ -11,6 +11,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\MaxWidth;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -18,6 +19,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Joaopaulolndev\FilamentGeneralSettings\FilamentGeneralSettingsPlugin;
 use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
@@ -88,6 +90,12 @@ class AdminPanelProvider extends PanelProvider
                 //         ->directory('images/backgrounds')
                 // ),
                 ])
+                ->renderHook(
+            
+                    PanelsRenderHook::FOOTER,
+                    fn (array $scopes): string => Blade::render('filament.layout.footer-nav'),
+                
+                );
                 
                 ;
     }

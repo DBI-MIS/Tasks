@@ -4,7 +4,6 @@
     class="record flex flex-col {{ $record->bg_color }} dark:{{ $record->bg_color }} rounded-md p-4 cursor-grab  dark:text-gray-800 border-l-8 shadow-md border-slate-300 
     {{ $record->text_color }} justify-between
     min-h-[100px] w-full"
-    style="max-width: 380px;"
     @if ($record->timestamps && now()->diffInSeconds($record->{$record::UPDATED_AT}) < 3) 
     x-data 
     x-init="
@@ -64,7 +63,7 @@
             Updated {{ $record->updated_at->diffForHumans() }}
         </span>
         <button wire:click="recordClicked('{{ $record->getKey() }}', {{ @json_encode($record) }})"
-            style="width: 20px">
+            class="w-6">
             <abbr title="Edit Task">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor">

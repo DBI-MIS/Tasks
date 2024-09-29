@@ -87,16 +87,13 @@ class AllTasksBoard extends KanbanBoard implements HasActions
 
     protected static ?string $title = 'All Tasks';
 
-    protected string $editModalTitle = 'Edit Record';
+    protected string $editModalTitle = 'Edit Task';
 
-    protected string $editModalSaveButtonLabel = 'Save';
+    protected string $editModalSaveButtonLabel = 'Update';
 
     protected string $editModalCancelButtonLabel = 'Cancel';
 
     protected bool $editModalSlideOver = true;
-
-    // public bool $disableEditModal = true;
-
 
     // protected function records(): Collection
     // {
@@ -118,6 +115,8 @@ class AllTasksBoard extends KanbanBoard implements HasActions
             $query->where('is_done', '!=', 'done')
                 ->whereBetween('created_at', [$startOfPeriod, $endOfPeriod]);
         })
+        ->orderBy('created_at', 'desc')
+        ->orderBy('updated_at', 'desc')
             ->get();
     }
 

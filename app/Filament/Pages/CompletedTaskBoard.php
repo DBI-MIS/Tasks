@@ -61,8 +61,17 @@ class CompletedTaskBoard extends KanbanBoard
 }
 
     protected static ?string $navigationGroup = 'Board';
+
     protected static ?string $title = 'My Completed Tasks';
+
     protected static ?int $navigationSort = 3;
+
+    protected string $editModalTitle = 'Edit Completed Task';
+
+    protected string $editModalSaveButtonLabel = 'Update';
+
+    protected string $editModalCancelButtonLabel = 'Cancel';
+
     protected bool $editModalSlideOver = true;
 
     
@@ -116,6 +125,8 @@ class CompletedTaskBoard extends KanbanBoard
                 })
                 ->orWhere('user_id', auth()->id());
             })
+            ->orderBy('created_at', 'desc')
+            ->orderBy('updated_at', 'desc')
             ->get();
 }
 

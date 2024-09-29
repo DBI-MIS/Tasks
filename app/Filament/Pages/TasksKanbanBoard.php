@@ -58,10 +58,19 @@ class TasksKanbanBoard extends KanbanBoard
     protected static string $statusEnum = TaskStatus::class;
 
     protected ?string $subheading = 'Mark as Done or Delete to remove from board.';
+
     protected static ?int $navigationSort = 2;
 
     protected static ?string $navigationGroup = 'Board';
+
     protected static ?string $title = 'My Tasks';
+
+    protected string $editModalTitle = 'Edit Task';
+
+    protected string $editModalSaveButtonLabel = 'Update';
+
+    protected string $editModalCancelButtonLabel = 'Cancel';
+
     protected bool $editModalSlideOver = true;
 
 
@@ -74,21 +83,23 @@ class TasksKanbanBoard extends KanbanBoard
         $currentDate = Carbon::now();
         $startOfPeriod = $currentDate->copy()->subDays(30);
         $endOfPeriod = $currentDate;
-    
+
         // Retrieve tasks created from Monday to Friday with status not equal to 'done'
         // and either belong to a team with the current authenticated user or are directly assigned to the current authenticated user
         return Task::where(function ($query) use ($startOfPeriod, $endOfPeriod) {
-                $query->where('is_done', '!=', 'done')
-                      ->whereBetween('created_at', [$startOfPeriod, $endOfPeriod]);
+            $query->where('is_done', '!=', 'done')
+                ->whereBetween('created_at', [$startOfPeriod, $endOfPeriod]);
+        })
+
+            ->where(function ($query) {
+                $query->whereHas('team', function ($query) {
+                    $query->where('user_id', auth()->id());
+                })
+                    ->orWhere('user_id', auth()->id());
             })
-                    
-                    ->where(function ($query) {
-                        $query->whereHas('team', function ($query) {
-                            $query->where('user_id', auth()->id());
-                        })
-                        ->orWhere('user_id', auth()->id());
-                    })
-                    ->get();
+            ->orderBy('created_at', 'desc')
+            ->orderBy('updated_at', 'desc')
+            ->get();
     }
 
     public function onStatusChanged(int $recordId, string $status, array $fromOrderedIds, array $toOrderedIds): void
@@ -110,29 +121,29 @@ class TasksKanbanBoard extends KanbanBoard
     {
         return [
             RadioDeck::make('is_done')
-            ->label('Status')
-                        ->options(CompletedStatus::class)
-                        ->descriptions(CompletedStatus::class)
-                        ->icons(CompletedStatus::class)
-                        ->default(CompletedStatus::PendingReview)
-                        ->iconSize(IconSize::Small)
-                        ->iconPosition(IconPosition::Before)
-                        ->alignment(Alignment::Center)
-                        ->visible(function (Get $get) { 
-                            return $get('status') == 'review'; 
-                        }) 
-                        ->extraCardsAttributes([
-                            'class' => 'rounded-md'
-                        ])
-                        ->extraOptionsAttributes([
-                            'class' => 'text-sm leading-none w-full flex flex-col items-center justify-center p-1'
-                        ])
-                        ->extraDescriptionsAttributes([ 
-                            'class' => 'text-xs font-light text-center'
-                        ])
-                        ->color('primary')
-                        ->padding('px-3 px-3') 
-                        ->columns(3),
+                ->label('Status')
+                ->options(CompletedStatus::class)
+                ->descriptions(CompletedStatus::class)
+                ->icons(CompletedStatus::class)
+                ->default(CompletedStatus::PendingReview)
+                ->iconSize(IconSize::Small)
+                ->iconPosition(IconPosition::Before)
+                ->alignment(Alignment::Center)
+                ->visible(function (Get $get) {
+                    return $get('status') == 'review';
+                })
+                ->extraCardsAttributes([
+                    'class' => 'rounded-md'
+                ])
+                ->extraOptionsAttributes([
+                    'class' => 'text-sm leading-none w-full flex flex-col items-center justify-center p-1'
+                ])
+                ->extraDescriptionsAttributes([
+                    'class' => 'text-xs font-light text-center'
+                ])
+                ->color('primary')
+                ->padding('px-3 px-3')
+                ->columns(3),
             Section::make('Task Details')
                 ->description(' ')
                 ->schema([
@@ -166,61 +177,61 @@ class TasksKanbanBoard extends KanbanBoard
 
 
                         Select::make('project')
-                        ->label('Type')
-                        ->default('support assistance')
-                        ->live()
-                        ->options([
-                            'support assistance' => 'Support/Assistance',
-                            'troubleshooting' => 'Troubleshooting',
-                            'installation' => 'Installation',
-                            'update' => 'Update',
-                            'technical support' => 'Technical Support',
-                            'system management' => 'System Management',
-                            'web development' => 'Web Development',
-                            'email account management' => 'Email/Account Management',
-                            'backup management' => 'Backup Management',
-                            'preventive maintenance' => 'Preventive Maintenance',
-                            'printing editing' => 'Printing/Editing',
-                            'desktop publishing' => 'Desktop Publishing',
-                            'others' => 'Others',
-                        ])
-                        ->afterStateUpdated(function (Set $set, ?string $state) {
-                            $bgColors = [
-                                'support assistance' => 'bg-sky-800',
-                                'troubleshooting' => 'bg-red-400',
-                                'installation' => 'bg-sky-400',
-                                'update' => 'bg-pink-400',
-                                'technical support' => 'bg-orange-400',
-                                'system management' => 'bg-yellow-400',
-                                'web development' => 'bg-lime-400',
-                                'email account management' => 'bg-green-400',
-                                'backup management' => 'bg-teal-400',
-                                'preventive maintenance' => 'bg-yellow-400',
-                                'printing editing' => 'bg-violet-400',
-                                'desktop publishing' => 'bg-fuchsia-400',
-                                'others' => 'bg-white',
-                            ];
-                    
-                            $textColors = [
-                                'support assistance' => 'text-white',
-                                'troubleshooting' => 'text-black',
-                                'installation' => 'text-white',
-                                'update' => 'text-white',
-                                'technical support' => 'text-black',
-                                'system management' => 'text-black',
-                                'web development' => 'text-black',
-                                'email account management' => 'text-black',
-                                'backup management' => 'text-black',
-                                'preventive maintenance' => 'text-black',
-                                'printing editing' => 'text-white',
-                                'desktop publishing' => 'text-white',
-                                'others' => 'text-sky-600',
-                            ];
-                    
-                            $set('bg_color', $bgColors[$state] ?? 'bg-sky-400');
-                            $set('text_color', $textColors[$state] ?? 'text-white');
-                        })
-                        ->columnSpan(1),
+                            ->label('Type')
+                            ->default('support assistance')
+                            ->live()
+                            ->options([
+                                'support assistance' => 'Support/Assistance',
+                                'troubleshooting' => 'Troubleshooting',
+                                'installation' => 'Installation',
+                                'update' => 'Update',
+                                'technical support' => 'Technical Support',
+                                'system management' => 'System Management',
+                                'web development' => 'Web Development',
+                                'email account management' => 'Email/Account Management',
+                                'backup management' => 'Backup Management',
+                                'preventive maintenance' => 'Preventive Maintenance',
+                                'printing editing' => 'Printing/Editing',
+                                'desktop publishing' => 'Desktop Publishing',
+                                'others' => 'Others',
+                            ])
+                            ->afterStateUpdated(function (Set $set, ?string $state) {
+                                $bgColors = [
+                                    'support assistance' => 'bg-sky-800',
+                                    'troubleshooting' => 'bg-red-400',
+                                    'installation' => 'bg-sky-400',
+                                    'update' => 'bg-pink-400',
+                                    'technical support' => 'bg-orange-400',
+                                    'system management' => 'bg-yellow-400',
+                                    'web development' => 'bg-lime-400',
+                                    'email account management' => 'bg-green-400',
+                                    'backup management' => 'bg-teal-400',
+                                    'preventive maintenance' => 'bg-yellow-400',
+                                    'printing editing' => 'bg-violet-400',
+                                    'desktop publishing' => 'bg-fuchsia-400',
+                                    'others' => 'bg-white',
+                                ];
+
+                                $textColors = [
+                                    'support assistance' => 'text-white',
+                                    'troubleshooting' => 'text-black',
+                                    'installation' => 'text-white',
+                                    'update' => 'text-white',
+                                    'technical support' => 'text-black',
+                                    'system management' => 'text-black',
+                                    'web development' => 'text-black',
+                                    'email account management' => 'text-black',
+                                    'backup management' => 'text-black',
+                                    'preventive maintenance' => 'text-black',
+                                    'printing editing' => 'text-white',
+                                    'desktop publishing' => 'text-white',
+                                    'others' => 'text-sky-600',
+                                ];
+
+                                $set('bg_color', $bgColors[$state] ?? 'bg-sky-400');
+                                $set('text_color', $textColors[$state] ?? 'text-white');
+                            })
+                            ->columnSpan(1),
                         DatePicker::make('due_date')
                             ->label('Due Date')
                             ->date('D - M d, Y')
@@ -250,10 +261,10 @@ class TasksKanbanBoard extends KanbanBoard
                         ->hint('Assigned User/s')
                         ->helperText(' ')->columnSpan(3),
 
-                            Hidden::make('text_color')
-                            ->default('text-white'),
-                        Hidden::make('bg_color')
-                            ->default('bg-sky-400'),
+                    Hidden::make('text_color')
+                        ->default('text-white'),
+                    Hidden::make('bg_color')
+                        ->default('bg-sky-400'),
 
                 ])->columns(3),
         ];
@@ -264,25 +275,25 @@ class TasksKanbanBoard extends KanbanBoard
         return Task::find($recordId)->toArray();
     }
 
-    
+
     protected function editRecord($recordId, array $data, array $state): void
     {
 
-        
-// Determine status based on progress
-if ($data['progress'] == 100) {
-    // Task progress is 100%
-    $data['status'] = TaskStatus::ForReview;
-} elseif ($data['progress'] > 0 && $data['progress'] < 100) {
-    // Task is ongoing
-    $data['status'] = TaskStatus::OnGoing;
-} elseif ($data['progress'] == 0) {
-    // Task is yet to be started
-    $data['status'] = TaskStatus::Todo;
-}  elseif ($data['progress'] == -1) {
-    // Task is marked for deletion
-    $data['status'] = TaskStatus::Delete;
-} 
+
+        // Determine status based on progress
+        if ($data['progress'] == 100) {
+            // Task progress is 100%
+            $data['status'] = TaskStatus::ForReview;
+        } elseif ($data['progress'] > 0 && $data['progress'] < 100) {
+            // Task is ongoing
+            $data['status'] = TaskStatus::OnGoing;
+        } elseif ($data['progress'] == 0) {
+            // Task is yet to be started
+            $data['status'] = TaskStatus::Todo;
+        } elseif ($data['progress'] == -1) {
+            // Task is marked for deletion
+            $data['status'] = TaskStatus::Delete;
+        }
 
 
         Task::find($recordId)->update([
@@ -330,61 +341,61 @@ if ($data['progress'] == 100) {
 
 
                         Select::make('project')
-                        ->label('Type')
-                        ->default('support assistance')
-                        ->live()
-                        ->options([
-                            'support assistance' => 'Support/Assistance',
-                            'troubleshooting' => 'Troubleshooting',
-                            'installation' => 'Installation',
-                            'update' => 'Update',
-                            'technical support' => 'Technical Support',
-                            'system management' => 'System Management',
-                            'web development' => 'Web Development',
-                            'email account management' => 'Email/Account Management',
-                            'backup management' => 'Backup Management',
-                            'preventive maintenance' => 'Preventive Maintenance',
-                            'printing editing' => 'Printing/Editing',
-                            'desktop publishing' => 'Desktop Publishing',
-                            'others' => 'Others',
-                        ])
-                        ->afterStateUpdated(function (Set $set, ?string $state) {
-                            $bgColors = [
-                                'support assistance' => 'bg-sky-800',
-                                'troubleshooting' => 'bg-red-400',
-                                'installation' => 'bg-sky-400',
-                                'update' => 'bg-pink-400',
-                                'technical support' => 'bg-orange-400',
-                                'system management' => 'bg-yellow-400',
-                                'web development' => 'bg-lime-400',
-                                'email account management' => 'bg-green-400',
-                                'backup management' => 'bg-teal-400',
-                                'preventive maintenance' => 'bg-yellow-400',
-                                'printing editing' => 'bg-violet-400',
-                                'desktop publishing' => 'bg-fuchsia-400',
-                                'others' => 'bg-white',
-                            ];
-                    
-                            $textColors = [
-                                'support assistance' => 'text-white',
-                                'troubleshooting' => 'text-black',
-                                'installation' => 'text-white',
-                                'update' => 'text-white',
-                                'technical support' => 'text-black',
-                                'system management' => 'text-black',
-                                'web development' => 'text-black',
-                                'email account management' => 'text-black',
-                                'backup management' => 'text-black',
-                                'preventive maintenance' => 'text-black',
-                                'printing editing' => 'text-white',
-                                'desktop publishing' => 'text-white',
-                                'others' => 'text-sky-600',
-                            ];
-                    
-                            $set('bg_color', $bgColors[$state] ?? 'bg-sky-400');
-                            $set('text_color', $textColors[$state] ?? 'text-white');
-                        })
-                        ->columnSpan(1),
+                            ->label('Type')
+                            ->default('support assistance')
+                            ->live()
+                            ->options([
+                                'support assistance' => 'Support/Assistance',
+                                'troubleshooting' => 'Troubleshooting',
+                                'installation' => 'Installation',
+                                'update' => 'Update',
+                                'technical support' => 'Technical Support',
+                                'system management' => 'System Management',
+                                'web development' => 'Web Development',
+                                'email account management' => 'Email/Account Management',
+                                'backup management' => 'Backup Management',
+                                'preventive maintenance' => 'Preventive Maintenance',
+                                'printing editing' => 'Printing/Editing',
+                                'desktop publishing' => 'Desktop Publishing',
+                                'others' => 'Others',
+                            ])
+                            ->afterStateUpdated(function (Set $set, ?string $state) {
+                                $bgColors = [
+                                    'support assistance' => 'bg-sky-800',
+                                    'troubleshooting' => 'bg-red-400',
+                                    'installation' => 'bg-sky-400',
+                                    'update' => 'bg-pink-400',
+                                    'technical support' => 'bg-orange-400',
+                                    'system management' => 'bg-yellow-400',
+                                    'web development' => 'bg-lime-400',
+                                    'email account management' => 'bg-green-400',
+                                    'backup management' => 'bg-teal-400',
+                                    'preventive maintenance' => 'bg-yellow-400',
+                                    'printing editing' => 'bg-violet-400',
+                                    'desktop publishing' => 'bg-fuchsia-400',
+                                    'others' => 'bg-white',
+                                ];
+
+                                $textColors = [
+                                    'support assistance' => 'text-white',
+                                    'troubleshooting' => 'text-black',
+                                    'installation' => 'text-white',
+                                    'update' => 'text-white',
+                                    'technical support' => 'text-black',
+                                    'system management' => 'text-black',
+                                    'web development' => 'text-black',
+                                    'email account management' => 'text-black',
+                                    'backup management' => 'text-black',
+                                    'preventive maintenance' => 'text-black',
+                                    'printing editing' => 'text-white',
+                                    'desktop publishing' => 'text-white',
+                                    'others' => 'text-sky-600',
+                                ];
+
+                                $set('bg_color', $bgColors[$state] ?? 'bg-sky-400');
+                                $set('text_color', $textColors[$state] ?? 'text-white');
+                            })
+                            ->columnSpan(1),
                         DatePicker::make('due_date')
                             ->label('Due Date')
                             ->date('D - M d, Y')
@@ -415,15 +426,13 @@ if ($data['progress'] == 100) {
                         ->hint('Assigned User/s')
                         ->helperText(' ')->columns(3),
 
-                        Hidden::make('text_color')
+                    Hidden::make('text_color')
                         ->default('text-white'),
                     Hidden::make('bg_color')
                         ->default('bg-sky-400'),
-                      
+
                 ]),
         ];
-
-       
     }
 
     protected function additionalRecordData(Model $record): Collection
@@ -441,12 +450,12 @@ if ($data['progress'] == 100) {
     }
 
     public function deleteRecord(int $recordId)
-{
-    Task::find($recordId)->delete();
+    {
+        Task::find($recordId)->delete();
 
-    Notification::make()
-    ->title('Deleted successfully')
-    ->success()
-    ->send();
-}
+        Notification::make()
+            ->title('Deleted successfully')
+            ->success()
+            ->send();
+    }
 }

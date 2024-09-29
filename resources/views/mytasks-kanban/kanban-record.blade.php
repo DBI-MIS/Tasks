@@ -53,9 +53,12 @@
 
         <div class="flex flex-row gap-x-2 my-2">
             <div
-                class="w-8 h-8 rounded-full shadow shadow-gray-400 {{ $record->bg_color }} border-2 border-white pt-[2px] text-center items-center">
+            class="w-8 h-8 rounded-full shadow shadow-gray-400 {{ $record->bg_color }} border-2 border-white pt-[2px] text-center items-center"
+            style="background-image: url('{{ $record->user->profile_photo_path ? asset('storage/' . $record->user->profile_photo_path) : '' }}'); background-size: cover; background-position: center;">
+            @if (!$record->user->profile_photo_path)
                 <span class="text-sm">{{ strtoupper($record->user?->name[0]) }}</span>
-            </div>
+            @endif
+        </div>
             <div>
                 <div class="font-light text-sm">
                     {{ $record->user->name ?? 'No Owner' }}
@@ -71,14 +74,16 @@
     <div class="flex flex-row hover:space-x-1 -space-x-2 mb-2 ">
         @foreach ($record['team'] as $member)
             <div
-                class="w-6 h-6 rounded-full shadow shadow-gray-400 {{ $record->bg_color }} border-2 border-white pt-[2px] text-center items-center transition-all ease-in-out group relative">
+                class="w-6 h-6 rounded-full shadow shadow-gray-400 {{ $record->bg_color }} border-2 border-white pt-[2px] text-center items-center transition-all ease-in-out group relative"
+                style="background-image: url('{{ $member->profile_photo_path ? asset('storage/' . $member->profile_photo_path) : '' }}'); background-size: cover; background-position: center;">
             <abbr title="{{ $member->name }}">
+                @if (!$member->profile_photo_path)
                 <span class="text-xs text-center absolute -translate-x-1/2">{{ strtoupper($member->name[0]) }}</span>
+                @endif
             </abbr>
                 
             </div>
         @endforeach
-
 
     </div>
     <span class="text-xs font-light m-y-5"> {{ $record->progress }}% Progress</span>
@@ -93,7 +98,7 @@
         </span> 
         <div class="flex gap-2">
             <button wire:click="recordClicked('{{ $record->getKey() }}', {{ @json_encode($record) }})"
-                style="width: 20px">
+                class="w-6">
                 <abbr title="Edit Task">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor">
@@ -104,7 +109,7 @@
             </button>
             <button 
             wire:click="deleteRecord({{ $record->id }})" 
-            style="width: 20px"
+            class="w-6"
             wire:confirm="Are you sure you want to delete this task?">
             <abbr title="Delete Task">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" 
