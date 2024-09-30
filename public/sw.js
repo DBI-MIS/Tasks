@@ -6,6 +6,12 @@ const OFFLINE_URL = "https://task.dbiphils.com/offline.html";
 
 const cacheAssets = [
     '/favicon.ico',
+    '/offline.html',
+    '/build/',
+    '/css/',
+    '/images/',
+    '/js/',
+    '/default_profile.jpg',
 ];
 
 self.addEventListener('install', event => {
