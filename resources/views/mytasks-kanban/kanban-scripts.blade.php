@@ -29,6 +29,12 @@
     Livewire.dispatch('delete-record', {recordId});
 }
 
+function onMarkAsDone(e) {
+    const recordId = e.item.id;
+
+    Livewire.dispatch('mark-as-done', {recordId});
+}
+
 
     function onUpdate(e) {
         const recordId = e.item.id
@@ -69,6 +75,7 @@
             setData,
             onAdd,
             onDelete,
+            onMarkAsDone,
         });
     });
 });

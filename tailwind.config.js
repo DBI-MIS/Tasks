@@ -13,6 +13,7 @@ export default {
     './resources/views/components/*.blade.php',
     './resources/views/filament/**/*.blade.php',
     './vendor/filament/**/*.blade.php',
+    './vendor/filament/widgets/*.blade.php',
     './vendor/filament/forms/components/*.blade.php',
     './vendor/jaocero/radio-deck/resources/views/**/*.blade.php',
   ],

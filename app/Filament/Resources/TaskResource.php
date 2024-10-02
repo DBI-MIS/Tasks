@@ -29,6 +29,7 @@ use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\Indicator;
+use Illuminate\Support\Facades\Auth;
 
 class TaskResource extends Resource
 {
@@ -40,7 +41,16 @@ class TaskResource extends Resource
 
     protected static ?string $label = 'Task History';
 
-    protected static bool $shouldRegisterNavigation = true;
+    public static function shouldRegisterNavigation(): bool
+    {
+        $user = Auth::user();
+
+        if ($user && $user->role === 'ADMIN') {
+            return true;
+        }
+
+        return false;
+    }
 
     public static function form(Form $form): Form
     {
@@ -154,7 +164,7 @@ class TaskResource extends Resource
                 ->defaultPaginationPageOption(50)
                 ->filters([
 
-                SelectFilter::make('user')
+            SelectFilter::make('user')
                 ->relationship('user', 'name', function (Builder $query) {
                     if (auth()->user()->role === 'ADMIN') {
                         // Show all users if the role is 'ADMIN'

@@ -19,6 +19,8 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Components\ViewField;
 use Filament\Forms\Set;
+use Filament\Pages\Dashboard\Actions\FilterAction;
+use Filament\Pages\Dashboard\Concerns\HasFiltersAction;
 use Guava\FilamentClusters\Forms\Cluster;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -27,10 +29,13 @@ use JaOcero\RadioDeck\Forms\Components\RadioDeck;
 use Filament\Support\Enums\IconSize;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\IconPosition;
-
+use Illuminate\Database\Eloquent\Builder;
 
 class CompletedTaskBoard extends KanbanBoard
 {
+
+    use HasFiltersAction;
+
     protected static ?string $navigationIcon = 'heroicon-s-clipboard-document-check';
 
     protected static string $view = 'completedtasks-kanban.kanban-board';
@@ -51,13 +56,26 @@ class CompletedTaskBoard extends KanbanBoard
 
     public function getSubheading(): ?string
 {
-    $prefix = 'Completed Tasks for ';
+    $prefix = 'Completed Tasks';
     
     // Get the current month using now()->format('F')
     $currentMonth = now()->format('F');
-    
+
+    // Check if filters are applied
+    if (isset($this->filters['startDate']) && isset($this->filters['endDate'])) {
+        // Get the month names from the startDate and endDate
+        $startDate = \Carbon\Carbon::parse($this->filters['startDate']);
+        $endDate = \Carbon\Carbon::parse($this->filters['endDate']);
+        
+        $startMonth = $startDate->format('F');
+        $endMonth = $endDate->format('F');
+
+        // Return the prefix concatenated with the month range
+        return $prefix . ' from '. $startMonth . ' to ' . $endMonth;
+    }
+
     // Return the prefix concatenated with the current month
-    return $prefix . $currentMonth;
+    return $prefix . ' for ' . $currentMonth;
 }
 
     protected static ?string $navigationGroup = 'Board';
@@ -111,12 +129,21 @@ class CompletedTaskBoard extends KanbanBoard
     $endOfPeriod = $startOfMonth->copy()->addDays(30);
 
     // If the user hasn't provided a custom date range, use the default range
-    $startDate = $this->startDate ?? $startOfMonth;
-    $endDate = $this->endDate ?? $endOfPeriod;
+
+    $startDate = $this->filters['startDate'] ?? $startOfMonth;
+    $endDate = $this->filters['endDate'] ?? $endOfPeriod;
+
+    // $startDate = $this->startDate ?? $startOfMonth;
+    // $endDate = $this->endDate ?? $endOfPeriod;
 
     // Default query: filter by 'is_done' and created within the first 30 days of the month
     $query = Task::where('is_done', 'done')
-                 ->whereBetween('created_at', [$startDate, $endDate]);
+                //  ->whereBetween('created_at', [$startDate, $endDate]),
+                ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
+                ->when($endDate, fn (Builder $query) => $query->whereDate('created_at', '<=', $endDate));
+
+    // $query = Task::where('is_done', 'done')
+    //              ->whereBetween('created_at', [$startDate, $endDate]);
 
     // Additional filtering: tasks that belong to a team or are directly assigned to the user
     return $query->where(function ($query) {
@@ -346,7 +373,18 @@ class CompletedTaskBoard extends KanbanBoard
         ]);
     }
 
-    
+    protected function getHeaderActions(): array
+    {
+        return [
+            FilterAction::make()
+                ->form([
+                    DatePicker::make('startDate'),
+                    DatePicker::make('endDate'),
+                ])
+                ->iconButton()
+                ->icon('heroicon-m-funnel'),
+        ];
+    }
 
     protected function additionalRecordData(Model $record): Collection
     {

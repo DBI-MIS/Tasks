@@ -458,4 +458,20 @@ class TasksKanbanBoard extends KanbanBoard
             ->success()
             ->send();
     }
+
+    public function markAsDone(int $recordId)
+    {
+
+        Task::find($recordId)->update([
+            'progress' => 100,
+            'is_done' => CompletedStatus::Done,
+            'status' => TaskStatus::Done,
+
+        ]);
+
+        Notification::make()
+            ->title('Mark as done successfully')
+            ->success()
+            ->send();
+    }
 }

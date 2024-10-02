@@ -34,19 +34,31 @@ use Parallax\FilamentComments\Actions\CommentsAction;
 use Parallax\FilamentComments\Models\Traits\HasFilamentComments;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Components\ViewField;
+use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
+use Filament\Pages\Dashboard\Actions\FilterAction;
+use Filament\Pages\Dashboard\Concerns\HasFiltersAction;
+use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use Filament\Support\Enums\ActionSize;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Illuminate\Database\Eloquent\Builder;
 use SearchableTrait;
 
 class AllTasksBoard extends KanbanBoard implements HasActions
 {
 
     // use HasFilamentComments;
+    use HasFiltersAction;
+    use InteractsWithPageFilters;
+    // use HasFiltersForm;
 
 
     protected static string $view = 'alltasks-kanban.kanban-board';
@@ -102,21 +114,57 @@ class AllTasksBoard extends KanbanBoard implements HasActions
 
     // }
 
+    public $startDate;
+    public $endDate;
+    public $searchText;
+    public $searchSelect;
+
+
+    // protected $rules = [
+    //     'searchText' => 'nullable',
+    //     'searchSelect' => 'nullable',
+    //     'startDate' => 'nullable|date',
+    //     'endDate' => 'nullable|date|after_or_equal:startDate',
+    // ];
+
+    // public function filterByDate()
+    // {
+    //     $this->validate();
+    // }
+
     protected function records(): Collection
     {
-        // Get current date and determine the start and end of the period (last 30 days)
-        $currentDate = Carbon::now();
-        $startOfPeriod = $currentDate->copy()->subDays(30);
-        $endOfPeriod = $currentDate;
 
-        // Retrieve tasks created from Monday to Friday with status not equal to 'done'
-        // and either belong to a team with the current authenticated user or are directly assigned to the current authenticated user
-        return Task::where(function ($query) use ($startOfPeriod, $endOfPeriod) {
+        $currentDate = Carbon::now();
+        $startOfWeek = $currentDate->startOfWeek();
+        $startOfMonth = $currentDate->startOfMonth();
+        $startOfPeriod = $currentDate->copy()->subDays(30);
+        $endOfPeriod = $startOfMonth->copy()->addDays(30);
+
+        //filter
+        $startDate = $this->filters['startDate'] ?? $startOfMonth;
+        $endDate = $this->filters['endDate'] ?? $endOfPeriod;
+        $searchText = $this->filters['searchText'] ?? null;
+        $searchSelect = $this->filters['searchSelect'] ?? null;
+
+        $query = Task::when($startDate, fn(Builder $query) => $query->whereDate('created_at', '>=', $startDate))
+            ->when($endDate, fn(Builder $query) => $query->whereDate('created_at', '<=', $endDate));
+            // ->when(!empty($searchText), fn(Builder $query) => $query->where('title', 'like', "%" . $searchText . "%"));
+
+        return Task::where(function ($query) use ($startOfPeriod, $endOfPeriod, $searchText) {
             $query->where('is_done', '!=', 'done')
                 ->whereBetween('created_at', [$startOfPeriod, $endOfPeriod]);
+            $query->when(!empty($searchText), fn(Builder $query) => $query->whereRaw('LOWER(title) LIKE ?', ["%".strtolower($searchText)."%"]));
         })
-        ->orderBy('created_at', 'desc')
-        ->orderBy('updated_at', 'desc')
+        ->whereHas('user', function ($query) use ($searchSelect) {
+            $query->where('status', 'active');
+        
+            if (!empty($searchSelect)) {
+                $query->whereIn('department', $searchSelect);
+            }
+        })
+            ->orderBy('created_at', 'desc')
+            ->orderBy('updated_at', 'desc')
             ->get();
     }
 
@@ -170,21 +218,12 @@ class AllTasksBoard extends KanbanBoard implements HasActions
                         ->required()
                         ->columnSpan(1),
 
-                    // TextInput::make('progress')
-                    //     ->label('')
-                    //     ->prefix('Progress')
-                    //     ->numeric()
-                    //     ->maxValue(100)
-                    //     ->minValue(0)
-                    //     ->suffix('%')
-                    //     ->columnSpan(3),
-
                     ViewField::make('progress')
                         ->view('filament.forms.components.range-slider')
                         ->viewData([
                             'min' => 1,
                             'max' => 100,
-                        
+
                         ])
                         ->columnSpan(3),
 
@@ -292,79 +331,9 @@ class AllTasksBoard extends KanbanBoard implements HasActions
                     Hidden::make('bg_color')
                         ->default('bg-sky-400'),
 
-                    // Cluster::make([
-                    //     Select::make('text_color')
-                    //         ->default('text-white')
-                    //         ->required()
-                    //         ->options([
-                    //             'text-white' => 'white',
-                    //             'text-black' => 'black',
-                    //             'text-yellow-400' => 'yellow',
-                    //             'text-red-600' => 'red',
-                    //             'text-sky-600' => 'blue',
-                    //             'text-lime-600' => 'green',
-                    //         ])
-                    //         ->label(__('Text Color'))
-                    //         ->columnSpan(1),
-
-                    //     Select::make('bg_color')
-                    //         ->default('bg-sky-400')
-                    //         ->required()
-                    //         ->options([
-                    //             'bg-white' => 'white',
-                    //             'bg-black' => 'black',
-                    //             'bg-sky-400' => 'blue',
-                    //             'bg-sky-800' => 'dark blue',
-                    //             'bg-red-400' => 'red',
-                    //             'bg-orange-400' => 'orange',
-                    //             'bg-yellow-400' => 'yellow',
-                    //             'bg-lime-400' => 'lime',
-                    //             'bg-green-400' => 'green',
-                    //             'bg-teal-400' => 'teal',
-                    //             'bg-cyan-400' => 'cyan',
-                    //             'bg-violet-400' => 'violet',
-                    //             'bg-fuchsia-400' => 'fucshia',
-                    //             'bg-pink-400' => 'pink',
-                    //             'bg-rose-400' => 'rose',
-                    //         ])
-
-                    //         ->label(__('Background Color'))
-                    //         ->columnSpan(1),
-                    // ])
-                    //     ->label('Customization - Text Color | BG Color')
-                    //     ->hint('Default is White Text & Blue Background')
-                    //     ->helperText(' ')->columnSpan(3),
-                    // ToggleButtons::make('status')
-                    //     ->label('Set')->inline()->grouped()
-                    //     ->options([
-                    //         'todo' => 'Back to Todo',
-                    //         'ongoing' => 'On-Going',
-                    //         'review' => 'For Review',
-                    //         'deleted' => 'Delete',
-                    //     ])
-                    //     ->colors([
-                    //         'todo' => 'info',
-                    //         'ongoing' => 'warning',
-                    //         'review' => 'success',
-                    //         'deleted' => 'danger',
-                    //     ])
 
 
                 ])->columns(3),
-
-
-
-            // Actions::make([
-            //     Action::make('delete')
-            //         ->icon('heroicon-m-x-mark')
-            //         ->color('danger')
-            //         ->requiresConfirmation()
-            //         ->action(function () use ($recordId) {
-            //             static::$model::find($recordId)->delete();
-
-            //             $this->dispatch('close-modal', id: 'kanban--edit-record-modal');
-            //         }),
-            // ]),
 
 
 
@@ -417,6 +386,7 @@ class AllTasksBoard extends KanbanBoard implements HasActions
     protected function getHeaderActions(): array
     {
         return [
+
             CreateAction::make('task')
                 ->model(Task::class)
                 ->button()
@@ -533,49 +503,78 @@ class AllTasksBoard extends KanbanBoard implements HasActions
                     Hidden::make('bg_color')
                         ->default('bg-sky-400'),
 
-                    // Cluster::make([
-                    //     Select::make('text_color')
-                    //         ->default('text-white')
-                    //         ->required()
-                    //         ->options([
-                    //             'text-white' => 'white',
-                    //             'text-black' => 'black',
-                    //             'text-yellow-400' => 'yellow',
-                    //             'text-red-600' => 'red',
-                    //             'text-sky-600' => 'blue',
-                    //             'text-lime-600' => 'green',
-                    //         ])
-                    //         ->label(__('Text Color')),
-
-                    //     Select::make('bg_color')
-                    //         ->default('bg-sky-400')
-                    //         ->required()
-                    //         ->options([
-                    //             'bg-white' => 'white',
-                    //             'bg-black' => 'black',
-                    //             'bg-sky-400' => 'blue',
-                    //             'bg-sky-800' => 'dark blue',
-                    //             'bg-red-400' => 'red',
-                    //             'bg-orange-400' => 'orange',
-                    //             'bg-yellow-400' => 'yellow',
-                    //             'bg-lime-400' => 'lime',
-                    //             'bg-green-400' => 'green',
-                    //             'bg-teal-400' => 'teal',
-                    //             'bg-cyan-400' => 'cyan',
-                    //             'bg-violet-400' => 'violet',
-                    //             'bg-fuchsia-400' => 'fucshia',
-                    //             'bg-pink-400' => 'pink',
-                    //             'bg-rose-400' => 'rose',
-                    //         ])
-
-                    //         ->label(__('Background Color')),
-                    // ])
-                    //     ->label('Customization - Text Color | BG Color')
-                    //     ->hint('Default is White Text & Blue Background')
-                    //     ->helperText(' ')->columns(2),
 
 
                 ]),
+
+            FilterAction::make('filter')
+                ->form([
+                    TextInput::make('searchText')
+                    ->label('Search Task'),
+                    CheckboxList::make('searchSelect')
+                    ->label('Filter By Department')
+                    ->default('All')
+                    ->options([
+                        'Sales' => 'Sales',
+                        'TSD' => 'TSD',
+                        'DBE' => 'DBE',
+                        'Admin' => 'Admin',
+                        'Accounting' => 'Accounting',
+                        'HRAD' => 'HRAD',
+                        'Audit' => 'Audit',
+                        'Purchasing' => 'Purchasing',
+                        'MIS' => 'MIS',
+                        'Warehouse' => 'Warehouse',
+                        'Others' => 'Others',
+                    ])
+                    ->columns(2)
+                    ->bulkToggleable()
+                    ->selectAllAction(
+                        fn (Action $action) => $action->label('All'),
+                    ),
+                    // ->afterStateHydrated(function ($component, $state) {
+                    //     if (!filled($state)) {
+                    //         $component->state([
+                    //             'Sales',
+                    //             'TSD',
+                    //             'DBE',
+                    //             'Admin',
+                    //             'Accounting',
+                    //             'HRAD',
+                    //             'Audit',
+                    //             'Purchasing',
+                    //             'MIS',
+                    //             'Warehouse'
+                    //         ]);
+                    //     }
+                    // })
+                    // ->formatStateUsing(function ($context, $state) {
+                    //     return $context === 'create' ? [
+                    //         'Sales',
+                    //             'TSD',
+                    //             'DBE',
+                    //             'Admin',
+                    //             'Accounting',
+                    //             'HRAD',
+                    //             'Audit',
+                    //             'Purchasing',
+                    //             'MIS',
+                    //             'Warehouse'
+                    //         ] : $state;
+                    // }),
+                    // Select::make('searchSelect')
+                    // ->options(User::all()->pluck('department', 'id'))   
+                    //     ->multiple()
+                    //     ->label('Department'),
+                    DatePicker::make('startDate'),
+                    DatePicker::make('endDate'),
+
+                ])
+                ->iconButton()
+                ->icon('heroicon-m-funnel'),
+
+               
+
 
 
 
@@ -583,12 +582,14 @@ class AllTasksBoard extends KanbanBoard implements HasActions
         ];
     }
 
+
+
     protected function additionalRecordData(Model $record): Collection
     {
 
         return collect([
 
-            
+
             'urgent' => $record->urgent,
             'progress' => $record->progress,
             // 'owner' => $record->user->name,
@@ -601,16 +602,13 @@ class AllTasksBoard extends KanbanBoard implements HasActions
     }
 
 
-public function deleteRecord(int $recordId)
-{
-    Task::find($recordId)->delete();
+    public function deleteRecord(int $recordId)
+    {
+        Task::find($recordId)->delete();
 
-    Notification::make()
-    ->title('Deleted successfully')
-    ->success()
-    ->send();
-}
-
-
-
+        Notification::make()
+            ->title('Deleted successfully')
+            ->success()
+            ->send();
+    }
 }
