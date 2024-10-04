@@ -24,11 +24,15 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Notifications\Notification;
+use Filament\Pages\Dashboard\Actions\FilterAction;
+use Filament\Pages\Dashboard\Concerns\HasFiltersAction;
 use Filament\Support\Enums\ActionSize;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\IconPosition;
 use Filament\Support\Enums\IconSize;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Guava\FilamentClusters\Forms\Cluster;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -41,6 +45,10 @@ use Spatie\Activitylog\Contracts\Activity;
 
 class TasksKanbanBoard extends KanbanBoard
 {
+
+    use HasFiltersAction;
+    use InteractsWithPageFilters;
+
     protected static ?string $navigationIcon = 'heroicon-s-clipboard-document';
 
     protected static string $view = 'mytasks-kanban.kanban-board';
@@ -61,7 +69,7 @@ class TasksKanbanBoard extends KanbanBoard
 
     protected static ?int $navigationSort = 2;
 
-    protected static ?string $navigationGroup = 'Board';
+    protected static ?string $navigationGroup = 'Task';
 
     protected static ?string $title = 'My Tasks';
 
@@ -77,18 +85,37 @@ class TasksKanbanBoard extends KanbanBoard
     use LogCreateRecord;
     use LogEditRecord;
 
+    public $startDate;
+    public $endDate;
+    public $searchText;
+
     protected function records(): Collection
     {
-        // Get current date and the weekday number (0 for Sunday, 1 for Monday, etc.)
+
         $currentDate = Carbon::now();
+        $startOfWeek = $currentDate->startOfWeek();
+        $startOfMonth = $currentDate->startOfMonth();
         $startOfPeriod = $currentDate->copy()->subDays(30);
-        $endOfPeriod = $currentDate;
+        $endOfPeriod = $startOfMonth->copy()->addDays(30);
+        // $currentDate = Carbon::now();
+        // $startOfPeriod = $currentDate->copy()->subDays(30);
+        // $endOfPeriod = $currentDate;
+
+        
+        //Filters
+        $startDate = $this->filters['startDate'] ?? $startOfMonth;
+        $endDate = $this->filters['endDate'] ?? $endOfPeriod;
+        $searchText = $this->filters['searchText'] ?? null;
+
+        $query = Task::when($startDate, fn(Builder $query) => $query->whereDate('created_at', '>=', $startDate))
+        ->when($endDate, fn(Builder $query) => $query->whereDate('created_at', '<=', $endDate));
 
         // Retrieve tasks created from Monday to Friday with status not equal to 'done'
         // and either belong to a team with the current authenticated user or are directly assigned to the current authenticated user
-        return Task::where(function ($query) use ($startOfPeriod, $endOfPeriod) {
-            $query->where('is_done', '!=', 'done')
-                ->whereBetween('created_at', [$startOfPeriod, $endOfPeriod]);
+        return Task::where(function ($query) use ($startOfPeriod, $endOfPeriod, $searchText) {
+            $query->where('status', '!=', 'done');
+                // ->whereBetween('created_at', [$startOfPeriod, $endOfPeriod]);
+            $query->when(!empty($searchText), fn(Builder $query) => $query->whereRaw('LOWER(title) LIKE ?', ["%" . strtolower($searchText) . "%"]));
         })
 
             ->where(function ($query) {
@@ -99,6 +126,7 @@ class TasksKanbanBoard extends KanbanBoard
             })
             ->orderBy('created_at', 'desc')
             ->orderBy('updated_at', 'desc')
+            ->orderBy('order_column', 'desc')
             ->get();
     }
 
@@ -290,11 +318,11 @@ class TasksKanbanBoard extends KanbanBoard
         } elseif ($data['progress'] == 0) {
             // Task is yet to be started
             $data['status'] = TaskStatus::Todo;
-        } elseif ($data['progress'] == -1) {
-            // Task is marked for deletion
-            $data['status'] = TaskStatus::Delete;
         }
 
+        // if ($data['is_done'] = CompletedStatus::Done) {
+        //     $data['status'] = TaskStatus::Done;
+        // }
 
         Task::find($recordId)->update([
             'title' => $data['title'],
@@ -432,6 +460,18 @@ class TasksKanbanBoard extends KanbanBoard
                         ->default('bg-sky-400'),
 
                 ]),
+                FilterAction::make('filter')
+                ->form([
+                    TextInput::make('searchText')
+                        ->label('Search Task'),
+                    DatePicker::make('startDate'),
+                    DatePicker::make('endDate'),
+
+                ])
+                ->iconButton()
+                ->icon('heroicon-m-funnel'),
+
+        
         ];
     }
 
@@ -471,6 +511,21 @@ class TasksKanbanBoard extends KanbanBoard
 
         Notification::make()
             ->title('Mark as done successfully')
+            ->success()
+            ->send();
+    }
+
+    public function markAsOnHold(int $recordId)
+    {
+
+        Task::find($recordId)->update([
+            'is_done' => CompletedStatus::PendingReview,
+            'status' => TaskStatus::OnHold,
+
+        ]);
+
+        Notification::make()
+            ->title('Mark as On Hold successfully')
             ->success()
             ->send();
     }

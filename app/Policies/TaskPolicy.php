@@ -37,7 +37,7 @@ class TaskPolicy
      */
     public function update(User $user, Task $task): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() ||  $user->isEditor() ||  $user->isUser();
     }
 
     /**

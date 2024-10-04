@@ -43,6 +43,10 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         return $this->role === self::ROLE_USER;
     }
 
+    public function canManageSettings(){
+        return $this->role === self::ROLE_ADMIN;
+    }
+
 
     /**
      * The attributes that are mass assignable.

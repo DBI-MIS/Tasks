@@ -3,9 +3,7 @@
 <div id="{{ $record->getKey() }}"
     class="record flex flex-col {{ $record->bg_color }} dark:{{ $record->bg_color }} rounded-md p-4 cursor-grab  dark:text-gray-800 border-l-8 shadow-md border-slate-300 
     {{ $record->text_color }} justify-between mb-3"
-     
-    @if ($record->timestamps && now()->diffInSeconds($record->{$record::UPDATED_AT}) < 3) 
-    x-data 
+    @if ($record->timestamps && now()->diffInSeconds($record->{$record::UPDATED_AT}) < 3) x-data 
     x-init="
             $el.classList.add('animate-pulse-twice', 'bg-primary-100', 'dark:bg-primary-800')
             $el.classList.remove('bg-white', 'dark:bg-gray-700')
@@ -13,25 +11,24 @@
                 $el.classList.remove('bg-primary-100', 'dark:bg-primary-800')
                 $el.classList.add('{{ $record->bg_color }}', 'dark:{{ $record->bg_color }}')
             }, 2000)
-        " 
-        @endif>
+        " @endif>
 
 
     <div class="flex flex-col justify-between mb-2">
 
-       
 
-            <details class="group/sub w-full">
-                <summary class="flex flex-row justify-between list-none cursor-pointer my-auto">
-                    <div class="text-balance">
-                        @if ($record['urgent'])
-                            <x-heroicon-s-star class="top-0 right-0 {{ $record->text_color }} w-5 h-5 inline-block" />
-                        @endif
-                        {{ $record->{static::$recordTitleAttribute} }}
-                    </div>
 
-                    <span class="transition group-open/sub:rotate-180 h-min">
-                        <abbr title="Details">
+        <details class="group/sub w-full">
+            <summary class="flex flex-row justify-between list-none cursor-pointer my-auto">
+                <div class="text-balance">
+                    @if ($record['urgent'])
+                        <x-heroicon-s-star class="top-0 right-0 {{ $record->text_color }} w-5 h-5 inline-block" />
+                    @endif
+                    {{ $record->{static::$recordTitleAttribute} }}
+                </div>
+
+                <span class="transition group-open/sub:rotate-180 h-min">
+                    <abbr title="Details">
                         <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor"
                             stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24"
                             width="24">
@@ -39,68 +36,68 @@
                             </path>
                         </svg>
                     </abbr>
-                    </span>
+                </span>
 
-                </summary>
-                <div class="px-2">
-                    <div class="text-xs font-light border-l-2 border-slate-200 pl-2 mb-2">
-                        {{ $record->getTrim() ?? 'No Description' }}
+            </summary>
+            <div class="px-2 flex flex-row justify-between">
+                <div class="text-xs font-light border-l-2 border-slate-200 pl-2 mb-2">
+                    {{ $record->getTrim() ?? 'No Description' }}
+                </div>
+               
+            </div>
+        </details>
+
+
+        <div class="flex flex-row items-center justify-between">
+            <div class="flex flex-row gap-x-2 my-2">
+                <div class="w-8 h-8 rounded-full shadow shadow-gray-400 {{ $record->bg_color }} border-2 border-white pt-[2px] text-center items-center"
+                    style="background-image: url('{{ $record->user->profile_photo_path ? asset('storage/' . $record->user->profile_photo_path) : '' }}'); background-size: cover; background-position: center;">
+                    @if (!$record->user->profile_photo_path)
+                        <span class="text-sm">{{ strtoupper($record->user?->name[0]) }}</span>
+                    @endif
+                </div>
+                <div>
+                    <div class="font-light text-sm">
+                        {{ $record->user->name ?? 'No Owner' }}
+                    </div>
+                    <div class="font-light text-xs">
+                        Created {{ $record->created_at->diffForHumans() }}
                     </div>
                 </div>
-            </details>
-       
-
-<div class="flex flex-row items-center justify-between">
-        <div class="flex flex-row gap-x-2 my-2">
-            <div
-            class="w-8 h-8 rounded-full shadow shadow-gray-400 {{ $record->bg_color }} border-2 border-white pt-[2px] text-center items-center"
-            style="background-image: url('{{ $record->user->profile_photo_path ? asset('storage/' . $record->user->profile_photo_path) : '' }}'); background-size: cover; background-position: center;">
-            @if (!$record->user->profile_photo_path)
-                <span class="text-sm">{{ strtoupper($record->user?->name[0]) }}</span>
-            @endif
-        </div>
-            <div>
-                <div class="font-light text-sm">
-                    {{ $record->user->name ?? 'No Owner' }}
-                </div>
-                <div class="font-light text-xs">
-                    Created {{ $record->created_at->diffForHumans() }}
-                </div>
             </div>
-        </div>
-        @if($record->progress === 100)
-        <div class="flex flex-col items-center">
-        <button 
-            wire:click="markAsDone({{ $record->id }})" 
-            class="w-8"
-            wire:confirm="Are you sure you want to mark this done?">
-            <abbr title="Mark As Done">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                  </svg>
-                  
-    
-            </abbr>
-            
-            </button>
-            <span class="text-[8px]">Done</span>
-        </div>
-        @endif
+            @if ($record->progress === 100)
+                <div class="flex flex-col items-center">
+                    <button wire:click="markAsDone({{ $record->id }})" class="w-8"
+                        wire:confirm="Are you sure you want to mark this done?">
+                        <abbr title="Mark As Done">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+
+
+                        </abbr>
+
+                    </button>
+                    <span class="text-[8px]">Done</span>
+                </div>
+            @endif
         </div>
     </div>
 
 
     <div class="flex flex-row hover:space-x-1 -space-x-2 mb-2 ">
         @foreach ($record['team'] as $member)
-            <div
-                class="w-6 h-6 rounded-full shadow shadow-gray-400 {{ $record->bg_color }} border-2 border-white pt-[2px] text-center items-center transition-all ease-in-out group relative"
+            <div class="w-6 h-6 rounded-full shadow shadow-gray-400 {{ $record->bg_color }} border-2 border-white pt-[2px] text-center items-center transition-all ease-in-out group relative"
                 style="background-image: url('{{ $member->profile_photo_path ? asset('storage/' . $member->profile_photo_path) : '' }}'); background-size: cover; background-position: center;">
-            <abbr title="{{ $member->name }}">
-                @if (!$member->profile_photo_path)
-                <span class="text-xs text-center absolute -translate-x-1/2">{{ strtoupper($member->name[0]) }}</span>
-                @endif
-            </abbr>
-                
+                <abbr title="{{ $member->name }}">
+                    @if (!$member->profile_photo_path)
+                        <span
+                            class="text-xs text-center absolute -translate-x-1/2">{{ strtoupper($member->name[0]) }}</span>
+                    @endif
+                </abbr>
+
             </div>
         @endforeach
 
@@ -114,10 +111,9 @@
     <div class="w-full flex flex-row justify-between items-center">
         <span class="font-light text-xs float-left">
             Updated {{ $record->updated_at->diffForHumans() }}
-        </span> 
+        </span>
         <div class="flex gap-2">
-            <button wire:click="recordClicked('{{ $record->getKey() }}', {{ @json_encode($record) }})"
-                class="w-6">
+            <button wire:click="recordClicked('{{ $record->getKey() }}', {{ @json_encode($record) }})" class="w-6">
                 <abbr title="Edit Task">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor">
@@ -126,25 +122,36 @@
                     </svg>
                 </abbr>
             </button>
-            
-            <button 
-            wire:click="deleteRecord({{ $record->id }})" 
-            class="w-6"
-            wire:confirm="Are you sure you want to delete this task?">
-            <abbr title="Delete Task">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" 
-                stroke="currentColor" >
-            <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-            </svg>
-    
-            </abbr>
+
+            <button wire:click="deleteRecord({{ $record->id }})" class="w-6"
+                wire:confirm="Are you sure you want to delete this task?">
+                <abbr title="Delete Task">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m6 4.125 2.25 2.25m0 0 2.25 2.25M12 13.875l2.25-2.25M12 13.875l-2.25 2.25M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+                    </svg>
+
+                </abbr>
             </button>
 
-            
+            @if ($record->progress !== 100)
+           
+                <button wire:click="markAsOnHold({{ $record->id }})" class="w-8" wire:confirm="Are you sure?">
+                    <abbr title="Mark As On Hold">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 9.563C9 9.252 9.252 9 9.563 9h4.874c.311 0 .563.252.563.563v4.874c0 .311-.252.563-.563.563H9.564A.562.562 0 0 1 9 14.437V9.564Z" />
+                          </svg>
+                    </abbr>
+                </button>
+            @endif
 
-            </div>
 
-        
+
+        </div>
+
+
     </div>
 
 </div>

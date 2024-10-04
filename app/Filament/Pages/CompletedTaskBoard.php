@@ -78,7 +78,7 @@ class CompletedTaskBoard extends KanbanBoard
     return $prefix . ' for ' . $currentMonth;
 }
 
-    protected static ?string $navigationGroup = 'Board';
+    protected static ?string $navigationGroup = 'Task';
 
     protected static ?string $title = 'My Completed Tasks';
 

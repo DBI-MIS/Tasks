@@ -81,6 +81,9 @@ class TasksOverview extends Widget
 
         // $completionRate = $totalTasks > 0 ? round(($totalCompletedTasks / $totalTasks) * 100) : 0;
         $totalCompletionRate = $totalTasks > 0 ? round(($totalCompletedTasks / $totalTasks) * 100, 1) : 0;
+        $totalPendingTasks = $totalTasks - $totalCompletedTasks;
+        $totalCurrentMonthPendingTasks = $currentMonthAllTasks - $currentMonthAllCompletedTasks;
+        $totalPreviousMonthPendingTasks = $previousMonthAllTasks - $previousMonthAllCompletedTasks;
         $currentMonthCompletionRate = $currentMonthAllTasks > 0 ? round(($currentMonthAllCompletedTasks / $currentMonthAllTasks) * 100, 1) : 0;
         $previousMonthCompletionRate = $previousMonthAllTasks > 0 ? round(($previousMonthAllCompletedTasks / $previousMonthAllTasks) * 100, 1) : 0;
 
@@ -116,14 +119,24 @@ class TasksOverview extends Widget
                 ->when($endDate, fn(Builder $query) => $query->whereDate('created_at', '<=', $endDatePrevious))
                 ->count();
 
+               
         $myTotalCompletionRate = $myTotalTasks > 0 ? round(($myTotalCompletedTasks / $myTotalTasks) * 100, 1) : 0;
+        $myTotalPendingTasks =  $myTotalTasks - $myTotalCompletedTasks;
+        $myTotalCurrentMonthPendingTasks =  $myCurrentMonthTask - $myCurrentMonthCompletedTask;
+        $myTotalPreviousMonthPendingTasks = $myPreviousMonthTask - $myPreviousMonthCompletedTask;
         $myCurrentMonthCompletionRate = $myCurrentMonthTask > 0 ? round(($myCurrentMonthCompletedTask / $myCurrentMonthTask) * 100, 1) : 0;
         $myPreviousMonthCompletionRate = $myPreviousMonthTask > 0 ? round(($myPreviousMonthCompletedTask / $myPreviousMonthTask) * 100, 1) : 0;
+
+   
+        
 
 
         return [
             'totalTask' => $totalTasks,
+            'totalPendingTasks' => $totalPendingTasks,
             'currentMonthAllTask' => $currentMonthAllTasks,
+            'totalPreviousMonthPendingTasks' => $totalPreviousMonthPendingTasks,
+            'totalCurrentMonthPendingTasks' =>$totalCurrentMonthPendingTasks,
             'currentMonthAllCompletedTask' => $currentMonthAllCompletedTasks,
             'previousMonthAllTask' => $previousMonthAllTasks,
             'previousMonthAllCompletedTask' => $previousMonthAllCompletedTasks,
@@ -132,6 +145,9 @@ class TasksOverview extends Widget
             'previousMonthCompletionRate' => $previousMonthCompletionRate,
 
             'myTotalTasks' => $myTotalTasks,
+            'myTotalPendingTasks' => $myTotalPendingTasks,
+            'myTotalCurrentMonthPendingTasks' => $myTotalCurrentMonthPendingTasks,
+            'myTotalPreviousMonthPendingTasks' => $myTotalPreviousMonthPendingTasks,
             'myTotalCompletedTasks' => $myTotalCompletedTasks,
             'myCurrentMonthTask' => $myCurrentMonthTask,
             'myCurrentMonthCompletedTask' => $myCurrentMonthCompletedTask,

@@ -71,15 +71,9 @@ class AllTasksBoard extends KanbanBoard implements HasActions
 
     protected static string $scriptsView = 'alltasks-kanban.kanban-scripts';
 
-    public static function shouldRegisterNavigation(): bool
+    public static function canAccess(): bool
     {
-        $user = Auth::user();
-
-        if ($user && $user->role === 'ADMIN') {
-            return true;
-        }
-
-        return false;
+        return auth()->user()->canManageSettings();
     }
 
 
@@ -95,7 +89,7 @@ class AllTasksBoard extends KanbanBoard implements HasActions
 
     protected static ?int $navigationSort = 1;
 
-    protected static ?string $navigationGroup = 'Board';
+    protected static ?string $navigationGroup = 'Task';
 
     protected static ?string $title = 'All Tasks';
 
@@ -149,22 +143,22 @@ class AllTasksBoard extends KanbanBoard implements HasActions
 
         $query = Task::when($startDate, fn(Builder $query) => $query->whereDate('created_at', '>=', $startDate))
             ->when($endDate, fn(Builder $query) => $query->whereDate('created_at', '<=', $endDate));
-            // ->when(!empty($searchText), fn(Builder $query) => $query->where('title', 'like', "%" . $searchText . "%"));
 
         return Task::where(function ($query) use ($startOfPeriod, $endOfPeriod, $searchText) {
             $query->where('is_done', '!=', 'done')
                 ->whereBetween('created_at', [$startOfPeriod, $endOfPeriod]);
-            $query->when(!empty($searchText), fn(Builder $query) => $query->whereRaw('LOWER(title) LIKE ?', ["%".strtolower($searchText)."%"]));
+            $query->when(!empty($searchText), fn(Builder $query) => $query->whereRaw('LOWER(title) LIKE ?', ["%" . strtolower($searchText) . "%"]));
         })
-        ->whereHas('user', function ($query) use ($searchSelect) {
-            $query->where('status', 'active');
-        
-            if (!empty($searchSelect)) {
-                $query->whereIn('department', $searchSelect);
-            }
-        })
+            ->whereHas('user', function ($query) use ($searchSelect) {
+                $query->where('status', 'active');
+
+                if (!empty($searchSelect)) {
+                    $query->whereIn('department', $searchSelect);
+                }
+            })
             ->orderBy('created_at', 'desc')
             ->orderBy('updated_at', 'desc')
+            ->orderBy('order_column', 'desc')
             ->get();
     }
 
@@ -360,10 +354,11 @@ class AllTasksBoard extends KanbanBoard implements HasActions
         } elseif ($data['progress'] == 0) {
             // Task is yet to be started
             $data['status'] = TaskStatus::Todo;
-        } elseif ($data['progress'] == -1) {
-            // Task is marked for deletion
-            $data['status'] = TaskStatus::Delete;
-        }
+        } 
+
+        // if ($data['is_done'] = CompletedStatus::Done) {
+        //     $data['status'] = TaskStatus::Done;
+        // }
 
 
         Task::find($recordId)->update([
@@ -510,28 +505,28 @@ class AllTasksBoard extends KanbanBoard implements HasActions
             FilterAction::make('filter')
                 ->form([
                     TextInput::make('searchText')
-                    ->label('Search Task'),
+                        ->label('Search Task'),
                     CheckboxList::make('searchSelect')
-                    ->label('Filter By Department')
-                    ->default('All')
-                    ->options([
-                        'Sales' => 'Sales',
-                        'TSD' => 'TSD',
-                        'DBE' => 'DBE',
-                        'Admin' => 'Admin',
-                        'Accounting' => 'Accounting',
-                        'HRAD' => 'HRAD',
-                        'Audit' => 'Audit',
-                        'Purchasing' => 'Purchasing',
-                        'MIS' => 'MIS',
-                        'Warehouse' => 'Warehouse',
-                        'Others' => 'Others',
-                    ])
-                    ->columns(2)
-                    ->bulkToggleable()
-                    ->selectAllAction(
-                        fn (Action $action) => $action->label('All'),
-                    ),
+                        ->label('Filter By Department')
+                        ->default('All')
+                        ->options([
+                            'Sales' => 'Sales',
+                            'TSD' => 'TSD',
+                            'DBE' => 'DBE',
+                            'Admin' => 'Admin',
+                            'Accounting' => 'Accounting',
+                            'HRAD' => 'HRAD',
+                            'Audit' => 'Audit',
+                            'Purchasing' => 'Purchasing',
+                            'MIS' => 'MIS',
+                            'Warehouse' => 'Warehouse',
+                            'Others' => 'Others',
+                        ])
+                        ->columns(2)
+                        ->bulkToggleable()
+                        ->selectAllAction(
+                            fn(Action $action) => $action->label('All'),
+                        ),
                     // ->afterStateHydrated(function ($component, $state) {
                     //     if (!filled($state)) {
                     //         $component->state([
@@ -573,7 +568,7 @@ class AllTasksBoard extends KanbanBoard implements HasActions
                 ->iconButton()
                 ->icon('heroicon-m-funnel'),
 
-               
+
 
 
 

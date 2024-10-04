@@ -35,6 +35,12 @@ function onMarkAsDone(e) {
     Livewire.dispatch('mark-as-done', {recordId});
 }
 
+function onMarkAsOnHold(e) {
+    const recordId = e.item.id;
+
+    Livewire.dispatch('mark-as-on-hold', {recordId});
+}
+
 
     function onUpdate(e) {
         const recordId = e.item.id
@@ -76,6 +82,7 @@ function onMarkAsDone(e) {
             onAdd,
             onDelete,
             onMarkAsDone,
+            onMarkAsOnHold,
         });
     });
 });

@@ -11,4 +11,9 @@ class CreateTask extends CreateRecord
 {
     use LogCreateRecord;
     protected static string $resource = TaskResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }
