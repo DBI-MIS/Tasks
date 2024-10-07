@@ -49,7 +49,7 @@ class TasksKanbanBoard extends KanbanBoard
     use HasFiltersAction;
     use InteractsWithPageFilters;
 
-    protected static ?string $navigationIcon = 'heroicon-s-clipboard-document';
+    protected static ?string $navigationIcon = 'icon-task';
 
     protected static string $view = 'mytasks-kanban.kanban-board';
 

@@ -77,7 +77,7 @@ class AllTasksBoard extends KanbanBoard implements HasActions
     }
 
 
-    protected static ?string $navigationIcon = 'heroicon-s-clipboard-document-list';
+    protected static ?string $navigationIcon = 'icon-all-inbox';
 
     // protected ?string $subheading = 'Task with star is urgent';
 

@@ -22,7 +22,7 @@ use Mokhosh\FilamentKanban\Pages\KanbanBoard;
 class NotesBoard extends KanbanBoard
 {
 
-    protected static ?string $navigationIcon = 'heroicon-s-clipboard-document-list';
+    protected static ?string $navigationIcon = 'icon-note-alt';
     protected ?string $subheading = 'Have Fun!';
     protected static string $recordStatusAttribute = 'pin';
 

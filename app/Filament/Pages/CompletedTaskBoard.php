@@ -36,7 +36,7 @@ class CompletedTaskBoard extends KanbanBoard
 
     use HasFiltersAction;
 
-    protected static ?string $navigationIcon = 'heroicon-s-clipboard-document-check';
+    protected static ?string $navigationIcon = 'icon-task-list';
 
     protected static string $view = 'completedtasks-kanban.kanban-board';
 
