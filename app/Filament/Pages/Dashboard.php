@@ -17,6 +17,10 @@ class Dashboard extends BaseDashboard
     use HasFiltersForm;
     use HasFiltersAction;
 
+    protected static ?string $navigationIcon = 'icon-home';
+
+    protected static ?string $title = 'Home';
+
     public function getColumns(): int | string | array
     {
         return [

@@ -6,6 +6,7 @@ use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Filament\Tables\Table;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
+        Table::configureUsing(function (Table $table) {
+            $table->paginated([6, 12, 27, 51, 102]);
+        });
 
         FilamentView::registerRenderHook(
             PanelsRenderHook::HEAD_END,

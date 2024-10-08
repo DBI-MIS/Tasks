@@ -15,27 +15,32 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
 use JaOcero\RadioDeck\Contracts\HasIcons;
 
 class RecentTasks extends BaseWidget
 {
+    use InteractsWithPageFilters;
 
     protected static ?string $heading = 'Pending Tasks';
 
+    // protected static string $view = 'filament.widgets.recent-tasks';
+
     protected static ?int $sort = 3;
 
+    // protected int | string | array $columnSpan = 'full';
+
     protected int | string | array $columnSpan = [
-        'default' => 2,
+        'default' => '2',
         'sm' => 2,
         'md' => 2,
         'lg' => 3,
         'xl' => 4,
-
-
-
     ];
+
+    
 
     public function table(Table $table): Table
     {
@@ -55,7 +60,7 @@ class RecentTasks extends BaseWidget
         return $table
             ->query($query)
             ->persistSortInSession()
-            ->defaultPaginationPageOption(25)
+            ->defaultPaginationPageOption(12)
             ->striped()
             ->contentGrid([
                 'md' => 1,
@@ -69,10 +74,7 @@ class RecentTasks extends BaseWidget
                 SelectFilter::make('user')
                     ->relationship('user', 'name', function (Builder $query) {
                         if (auth()->user()->role === 'ADMIN') {
-                            // Show all users if the role is 'ADMIN'
-                            // No need to include withTrashed() here
                         } else {
-                            // Show only the user themselves if they are not 'ADMIN'
                             $query->where('id', auth()->user()->id);
                         }
                     })

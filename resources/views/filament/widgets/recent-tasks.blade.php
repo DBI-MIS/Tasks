@@ -1,3 +1,6 @@
+{{-- <x-filament-widgets::widget wire:init="getViewData"> --}}
+    
+
 <div class="px-4 py-3 {{$getRecord()->bg_color}} rounded-lg">
     <div class="flex flex-row justify-between pb-2 {{$getRecord()->text_color}}">
         <div class="flex flex-col items-start">
@@ -41,6 +44,6 @@
 
 
 
-    {{-- <x-filament-tables::columns.layout :components="$getComponents()" :record="$getRecord()" :record-key="$recordKey" /> --}}
 
 </div>
+{{-- </x-filament-widgets::widget> --}}
