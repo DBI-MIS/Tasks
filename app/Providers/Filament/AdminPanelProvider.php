@@ -44,6 +44,7 @@ class AdminPanelProvider extends PanelProvider
             ->font('Poppins')
             ->maxContentWidth(MaxWidth::Full)
             ->sidebarWidth('15rem')
+            ->databaseNotifications()
             ->colors([
                 'primary' => Color::hex('#36c'),
                 'danger' => Color::Red,

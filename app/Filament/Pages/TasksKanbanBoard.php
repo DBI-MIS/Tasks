@@ -23,6 +23,7 @@ use Filament\Forms\Components\ViewField;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Http\Middleware\Authenticate;
+use Filament\Notifications\Actions\Action as ActionsAction;
 use Filament\Notifications\Notification;
 use Filament\Pages\Dashboard\Actions\FilterAction;
 use Filament\Pages\Dashboard\Concerns\HasFiltersAction;
@@ -89,6 +90,8 @@ class TasksKanbanBoard extends KanbanBoard
     public $endDate;
     public $searchText;
 
+    // public $recipient = auth()->user();
+
     protected function records(): Collection
     {
 
@@ -101,20 +104,20 @@ class TasksKanbanBoard extends KanbanBoard
         // $startOfPeriod = $currentDate->copy()->subDays(30);
         // $endOfPeriod = $currentDate;
 
-        
+
         //Filters
         $startDate = $this->filters['startDate'] ?? $startOfMonth;
         $endDate = $this->filters['endDate'] ?? $endOfPeriod;
         $searchText = $this->filters['searchText'] ?? null;
 
         $query = Task::when($startDate, fn(Builder $query) => $query->whereDate('created_at', '>=', $startDate))
-        ->when($endDate, fn(Builder $query) => $query->whereDate('created_at', '<=', $endDate));
+            ->when($endDate, fn(Builder $query) => $query->whereDate('created_at', '<=', $endDate));
 
         // Retrieve tasks created from Monday to Friday with status not equal to 'done'
         // and either belong to a team with the current authenticated user or are directly assigned to the current authenticated user
         return Task::where(function ($query) use ($startOfPeriod, $endOfPeriod, $searchText) {
             $query->where('status', '!=', 'done');
-                // ->whereBetween('created_at', [$startOfPeriod, $endOfPeriod]);
+            // ->whereBetween('created_at', [$startOfPeriod, $endOfPeriod]);
             $query->when(!empty($searchText), fn(Builder $query) => $query->whereRaw('LOWER(title) LIKE ?', ["%" . strtolower($searchText) . "%"]));
         })
 
@@ -136,7 +139,6 @@ class TasksKanbanBoard extends KanbanBoard
 
         Task::find($recordId)->update(['status' => $status]);
         Task::setNewOrder($toOrderedIds);
-        // Log::info($message);
     }
 
     public function onSortChanged(int $recordId, string $status, array $orderedIds): void
@@ -147,7 +149,10 @@ class TasksKanbanBoard extends KanbanBoard
 
     protected function getEditModalFormSchema(null|int $recordId): array
     {
+
+
         return [
+            
             RadioDeck::make('is_done')
                 ->label('Status')
                 ->options(CompletedStatus::class)
@@ -306,7 +311,7 @@ class TasksKanbanBoard extends KanbanBoard
 
     protected function editRecord($recordId, array $data, array $state): void
     {
-
+        $recipient = auth()->user();
 
         // Determine status based on progress
         if ($data['progress'] == 100) {
@@ -338,12 +343,41 @@ class TasksKanbanBoard extends KanbanBoard
             'status' => $data['status'],
 
         ]);
+
+        Notification::make()
+        ->title('Task Updated successfully')
+        ->success()
+        ->actions([
+            // ActionsAction::make('view')
+            //     ->button()
+            //     ->markAsRead(),
+            ActionsAction::make('markAsUnread')
+                ->button()
+                ->markAsUnread(),
+        ])
+        ->sendToDatabase($recipient)
+        ->send();
     }
 
     protected function getHeaderActions(): array
     {
         return [
             CreateAction::make('task')
+                // ->successNotification(
+                //     Notification::make()
+                //         ->title('Task created successfully')
+                //         ->success()
+                //         ->actions([
+                //             // ActionsAction::make('view')
+                //             //     ->button()
+                //             //     ->markAsRead(),
+                //             ActionsAction::make('markAsUnread')
+                //                 ->button()
+                //                 ->markAsUnread(),
+                //         ])
+                //         ->sendToDatabase(auth()->user())
+                //         ->send()
+                // )
                 ->model(Task::class)
                 ->button()
                 ->size(ActionSize::Large)
@@ -460,7 +494,7 @@ class TasksKanbanBoard extends KanbanBoard
                         ->default('bg-sky-400'),
 
                 ]),
-                FilterAction::make('filter')
+            FilterAction::make('filter')
                 ->form([
                     TextInput::make('searchText')
                         ->label('Search Task'),
@@ -471,7 +505,7 @@ class TasksKanbanBoard extends KanbanBoard
                 ->iconButton()
                 ->icon('heroicon-m-funnel'),
 
-        
+
         ];
     }
 
@@ -491,16 +525,28 @@ class TasksKanbanBoard extends KanbanBoard
 
     public function deleteRecord(int $recordId)
     {
+        $recipient = auth()->user();
+
         Task::find($recordId)->delete();
 
         Notification::make()
             ->title('Deleted successfully')
             ->success()
+            ->actions([
+                // ActionsAction::make('view')
+                //     ->button()
+                //     ->markAsRead(),
+                ActionsAction::make('markAsUnread')
+                    ->button()
+                    ->markAsUnread(),
+            ])
+            ->sendToDatabase($recipient)
             ->send();
     }
 
     public function markAsDone(int $recordId)
     {
+        $recipient = auth()->user();
 
         Task::find($recordId)->update([
             'progress' => 100,
@@ -512,11 +558,21 @@ class TasksKanbanBoard extends KanbanBoard
         Notification::make()
             ->title('Mark as done successfully')
             ->success()
+            ->actions([
+                // ActionsAction::make('view')
+                //     ->button()
+                //     ->markAsRead(),
+                ActionsAction::make('markAsUnread')
+                    ->button()
+                    ->markAsUnread(),
+            ])
+            ->sendToDatabase($recipient)
             ->send();
     }
 
     public function markAsOnHold(int $recordId)
     {
+        $recipient = auth()->user();
 
         Task::find($recordId)->update([
             'is_done' => CompletedStatus::PendingReview,
@@ -527,6 +583,15 @@ class TasksKanbanBoard extends KanbanBoard
         Notification::make()
             ->title('Mark as On Hold successfully')
             ->success()
+            ->actions([
+                // ActionsAction::make('view')
+                //     ->button()
+                //     ->markAsRead(),
+                ActionsAction::make('markAsUnread')
+                    ->button()
+                    ->markAsUnread(),
+            ])
+            ->sendToDatabase($recipient)
             ->send();
     }
 }

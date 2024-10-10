@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Filament\Notifications\Livewire\DatabaseNotifications;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\Blade;
@@ -23,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        DatabaseNotifications::trigger('filament.notifications.database-notifications-trigger');
 
         Table::configureUsing(function (Table $table) {
             $table->paginated([6, 12, 27, 51, 102]);
@@ -68,6 +70,21 @@ class AppServiceProvider extends ServiceProvider
                 <link href="/pwa/icons/ios/256.png" sizes="256x256" rel="apple-touch-startup-image">
                 <link href="/pwa/icons/ios/192.png" sizes="192x192" rel="apple-touch-startup-image">
 
+            ',
+        );
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::BODY_START,
+            fn(): string => '
+                <script>
+                if ("serviceWorker" in navigator) {
+                    navigator.serviceWorker.register("/sw.js", { scope: "/" }).then(function (registration) {
+                        console.log("SW registered successfully!");
+                    }).catch(function (registrationError) {
+                        console.log("SW registration failed", registrationError);
+                    });
+                }
+                </script>
             ',
         );
     }

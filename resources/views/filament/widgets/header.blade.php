@@ -14,7 +14,7 @@
                     <div href="{{ route('filament.admin.pages.notes-board') }}" type="button" wire:navigate
                         class="text-nowrap text-center cursor-pointer text-sm text-white font-bold bg-sky-700 hover:bg-blue-900 w-full rounded-md py-2 px-2 sm:w-max" style="min-width: 90px">
                         <div class="flex flex-col items-center">
-                            {{ svg('icon-note-alt') }}
+                            <x-icon-note-alt class="size-8"/>
                         <span class="text-xs font-light">My Notes</span>
                     </div>
                     </div>
@@ -23,7 +23,8 @@
                 <div href="{{ route('filament.admin.pages.tasks-kanban-board') }}" type="button" wire:navigate
                     class="text-nowrap text-center cursor-pointer text-sm text-white font-bold bg-sky-700 hover:bg-blue-900 w-full rounded-md py-2 px-2 sm:w-max" style="min-width: 90px">
                     <div class="flex flex-col items-center">
-                        {{ svg('icon-task') }}
+
+                        <x-icon-task class="size-8"/>
                     <span class="text-xs font-light">Tasks</span>
                     </div>
                 </div>
@@ -32,7 +33,7 @@
                 <div href="{{ route('filament.admin.pages.completed-task-board') }}" type="button" wire:navigate
                     class="text-nowrap text-center cursor-pointer text-sm text-white font-bold bg-sky-700 hover:bg-blue-900 w-full rounded-md py-2 px-2 sm:w-max" style="min-width: 90px">
                     <div class="flex flex-col items-center">
-                        {{ svg('icon-task-list') }}
+                        <x-icon-task-list class="size-8"/>
                     <span class="text-xs font-light">Completed</span>
                     </div>
                 </div>
