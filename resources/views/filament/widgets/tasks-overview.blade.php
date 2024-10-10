@@ -14,9 +14,16 @@
                     <div class="flex flex-col w-48">
                         <span class="text-sm">Total Pending Tasks</span>
                         <div class="flex flex-col w-full">
-                            <span class="font-bold text-sm">{{ $totalTask }} <span class="text-[10px]">Total Tasks</span></span>
-                        </span>
+                            <span class="font-bold text-sm">{{ $totalTask }} <span class="text-[10px]">Total
+                                    Tasks</span></span>
+                            </span>
+
                             
+                            <div class="h-3 w-full relative">
+                                <div class="h-2 bg-gray-200 rounded-full absolute w-full"></div>
+                                <div class="h-2 absolute rounded-full bg-blue-600 "
+                                    style="width: {{ $totalCompletionRate }}%"></div>
+                            </div>
                             <span class="text-[10px]">{{ $totalCompletionRate }}% Completion Rate</span>
                         </div>
                     </div>
@@ -24,7 +31,8 @@
 
                 <div class="flex flex-row  w-full gap-6 items-center ">
                     <div class="flex flex-row items-center ">
-                        <span class="font-bold text-[42pt] w-full text-right" style="min-width: 80px">{{ $totalCurrentMonthPendingTasks }}
+                        <span class="font-bold text-[42pt] w-full text-right"
+                            style="min-width: 80px">{{ $totalCurrentMonthPendingTasks }}
 
                         </span>
                     </div>
@@ -34,6 +42,11 @@
                             <span class="font-bold text-sm w-full">{{ $currentMonthAllCompletedTask }}
                                 <span class="text-[10px]">Tasks this month</span>
                             </span>
+                            <div class="h-3 w-full relative">
+                                <div class="h-2 bg-gray-200 rounded-full absolute w-full"></div>
+                                <div class="h-2 absolute rounded-full bg-blue-600 "
+                                    style="width: {{ $currentMonthCompletionRate }}%"></div>
+                            </div>
                             <span class="text-[10px]">{{ $currentMonthCompletionRate }}% Completion Rate</span>
                         </div>
                     </div>
@@ -41,7 +54,8 @@
 
                 <div class="flex flex-row  w-full gap-6 items-center ">
                     <div class="flex flex-row items-center  ">
-                        <span class="font-bold text-[42pt] w-full text-right" style="min-width: 80px">{{ $totalPreviousMonthPendingTasks }}
+                        <span class="font-bold text-[42pt] w-full text-right"
+                            style="min-width: 80px">{{ $totalPreviousMonthPendingTasks }}
                         </span>
                     </div>
                     <div class="flex flex-col w-48">
@@ -50,24 +64,34 @@
                             <span class="font-bold text-sm ">{{ $previousMonthAllCompletedTask }}
                                 <span class="text-[10px]">Tasks last month</span>
                             </span>
+                            <div class="h-3 w-full relative">
+                                <div class="h-2 bg-gray-200 rounded-full absolute w-full"></div>
+                                <div class="h-2 absolute rounded-full bg-blue-600 "
+                                    style="width: {{ $previousMonthCompletionRate }}%"></div>
+                            </div>
                             <span class="text-[10px]">{{ $previousMonthCompletionRate }}% Completion Rate</span>
                         </div>
 
                     </div>
                 </div>
-
-          
             @endif
             @if (auth()->check() && auth()->user()->role !== 'ADMIN')
                 <div class="flex flex-row w-full gap-6 items-center ">
                     <div class="flex flex-row items-center  ">
-                        <span class="font-bold text-[42pt] w-full text-right" style="min-width: 80px">{{ $myTotalPendingTasks }}</span>
+                        <span class="font-bold text-[42pt] w-full text-right"
+                            style="min-width: 80px">{{ $myTotalPendingTasks }}</span>
                         </span>
                     </div>
                     <div class="flex flex-col w-48">
                         <span class="text-sm">Total Pending Tasks</span>
                         <div class="flex flex-col w-full">
-                            <span class="text-sm font-bold">{{ $myTotalTasks }} <span class="text-[10px]">Total Tasks</span></span>
+                            <span class="text-sm font-bold">{{ $myTotalTasks }} <span class="text-[10px]">Total
+                                    Tasks</span></span>
+                                    <div class="h-3 w-full relative">
+                                        <div class="h-2 bg-gray-200 rounded-full absolute w-full"></div>
+                                        <div class="h-2 absolute rounded-full bg-blue-600 "
+                                            style="width: {{ $myTotalCompletionRate }}%"></div>
+                                    </div>
                             <span class="text-[10px]">{{ $myTotalCompletionRate }}% Completion Rate</span>
                         </div>
                     </div>
@@ -75,7 +99,8 @@
 
                 <div class="flex flex-row  w-full gap-6 items-center ">
                     <div class="flex flex-row items-center ">
-                        <span class="font-bold text-[42pt] w-full text-right" style="min-width: 80px">{{ $myTotalCurrentMonthPendingTasks }}
+                        <span class="font-bold text-[42pt] w-full text-right"
+                            style="min-width: 80px">{{ $myTotalCurrentMonthPendingTasks }}
                         </span>
                     </div>
                     <div class="flex flex-col w-48">
@@ -84,15 +109,21 @@
                             <span class="text-sm font-bold">{{ $myCurrentMonthTask }}
                                 <span class="text-[10px]">Tasks this month</span>
                             </span>
+                            <div class="h-3 w-full relative">
+                                <div class="h-2 bg-gray-200 rounded-full absolute w-full"></div>
+                                <div class="h-2 absolute rounded-full bg-blue-600 "
+                                    style="width: {{ $myCurrentMonthCompletionRate }}%"></div>
+                            </div>
                             <span class="text-[10px]">{{ $myCurrentMonthCompletionRate }}% Completion Rate</span>
                         </div>
                     </div>
                 </div>
-           
+
 
                 <div class="flex flex-row  w-full gap-6 items-center ">
                     <div class="flex flex-row items-center  ">
-                        <span class="font-bold text-[42pt] w-full text-right" style="min-width: 80px">{{ $myTotalPreviousMonthPendingTasks }}
+                        <span class="font-bold text-[42pt] w-full text-right"
+                            style="min-width: 80px">{{ $myTotalPreviousMonthPendingTasks }}
                         </span>
                     </div>
                     <div class="flex flex-col w-48">
@@ -101,11 +132,15 @@
                             <span class="text-sm font-bold">{{ $myPreviousMonthCompletedTask }}
                                 <span class="text-[10px]">Tasks last month</span>
                             </span>
+                            <div class="h-3 w-full relative">
+                                <div class="h-2 bg-gray-200 rounded-full absolute w-full"></div>
+                                <div class="h-2 absolute rounded-full bg-blue-600 "
+                                    style="width: {{ $myPreviousMonthCompletionRate }}%"></div>
+                            </div>
                             <span class="text-[10px]">{{ $myPreviousMonthCompletionRate }}% Completion Rate</span>
                         </div>
                     </div>
                 </div>
-
             @endif
         </div>
 
