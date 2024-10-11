@@ -80,12 +80,16 @@ class TasksOverview extends Widget
 
 
         // $completionRate = $totalTasks > 0 ? round(($totalCompletedTasks / $totalTasks) * 100) : 0;
-        $totalCompletionRate = $totalTasks > 0 ? round(($totalCompletedTasks / $totalTasks) * 100, 1) : 0;
+        // $totalCompletionRate = $totalTasks > 0 ? round(($totalCompletedTasks / $totalTasks) * 100, 1) : 0;
+        $totalCompletionRate = $totalTasks > 0 ? intval(round(($totalCompletedTasks / $totalTasks) * 100)) : 0;
+
         $totalPendingTasks = $totalTasks - $totalCompletedTasks;
         $totalCurrentMonthPendingTasks = $currentMonthAllTasks - $currentMonthAllCompletedTasks;
         $totalPreviousMonthPendingTasks = $previousMonthAllTasks - $previousMonthAllCompletedTasks;
-        $currentMonthCompletionRate = $currentMonthAllTasks > 0 ? round(($currentMonthAllCompletedTasks / $currentMonthAllTasks) * 100, 1) : 0;
-        $previousMonthCompletionRate = $previousMonthAllTasks > 0 ? round(($previousMonthAllCompletedTasks / $previousMonthAllTasks) * 100, 1) : 0;
+        // $currentMonthCompletionRate = $currentMonthAllTasks > 0 ? round(($currentMonthAllCompletedTasks / $currentMonthAllTasks) * 100, 1) : 0;
+        // $previousMonthCompletionRate = $previousMonthAllTasks > 0 ? round(($previousMonthAllCompletedTasks / $previousMonthAllTasks) * 100, 1) : 0;
+        $currentMonthCompletionRate = $currentMonthAllTasks > 0 ? intval(round(($currentMonthAllCompletedTasks / $currentMonthAllTasks) * 100)) : 0;
+        $previousMonthCompletionRate = $previousMonthAllTasks > 0 ? intval(round(($previousMonthAllCompletedTasks / $previousMonthAllTasks) * 100)) : 0;
 
         $myTotalTasks = Task::query()
                 ->where('user_id', auth()->id())
@@ -120,13 +124,15 @@ class TasksOverview extends Widget
                 ->count();
 
                
-        $myTotalCompletionRate = $myTotalTasks > 0 ? round(($myTotalCompletedTasks / $myTotalTasks) * 100, 1) : 0;
+        // $myTotalCompletionRate = $myTotalTasks > 0 ? round(($myTotalCompletedTasks / $myTotalTasks) * 100, 1) : 0;
+        $myTotalCompletionRate = $myTotalTasks > 0 ? intval(round(($myTotalCompletedTasks / $myTotalTasks) * 100)) : 0;
         $myTotalPendingTasks =  $myTotalTasks - $myTotalCompletedTasks;
         $myTotalCurrentMonthPendingTasks =  $myCurrentMonthTask - $myCurrentMonthCompletedTask;
         $myTotalPreviousMonthPendingTasks = $myPreviousMonthTask - $myPreviousMonthCompletedTask;
-        $myCurrentMonthCompletionRate = $myCurrentMonthTask > 0 ? round(($myCurrentMonthCompletedTask / $myCurrentMonthTask) * 100, 1) : 0;
-        $myPreviousMonthCompletionRate = $myPreviousMonthTask > 0 ? round(($myPreviousMonthCompletedTask / $myPreviousMonthTask) * 100, 1) : 0;
-
+        // $myCurrentMonthCompletionRate = $myCurrentMonthTask > 0 ? round(($myCurrentMonthCompletedTask / $myCurrentMonthTask) * 100, 1) : 0;
+        // $myPreviousMonthCompletionRate = $myPreviousMonthTask > 0 ? round(($myPreviousMonthCompletedTask / $myPreviousMonthTask) * 100, 1) : 0;
+        $myCurrentMonthCompletionRate = $myCurrentMonthTask > 0 ? intval(round(($myCurrentMonthCompletedTask / $myCurrentMonthTask) * 100)) : 0;
+        $myPreviousMonthCompletionRate = $myPreviousMonthTask > 0 ? intval(round(($myPreviousMonthCompletedTask / $myPreviousMonthTask) * 100)) : 0;
    
         
 

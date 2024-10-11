@@ -2,23 +2,15 @@
     
 
 <div class="px-4 py-3 {{$getRecord()->bg_color}} rounded-lg">
-    <div class="flex flex-row justify-between pb-2 {{$getRecord()->text_color}}">
-        <div class="flex flex-col items-start">
-            <span class="text-[10px]">Task:</span>
+    <div class="flex flex-col items-start pb-2 {{$getRecord()->text_color}}">
+        
             <div>
 
                 {{ $getRecord()->title }}
 
             </div>
-        </div>
-        <div class="flex flex-col items-end">
-            <span class="text-[10px]">Created:</span>
-            <div class="text-xs">
-
-                {{ $getRecord()->created_at->diffForHumans() }}
-
-            </div>
-        </div>
+        
+      
 
 
 
@@ -39,7 +31,14 @@
 
     </div>
 
+    <div class="flex items-start gap-1 pt-2 {{ $getRecord()->text_color }}">
+        <span class="text-[10px]">Created:</span>
+        <div class="text-xs">
 
+            {{ $getRecord()->created_at->diffForHumans() }}
+
+        </div>
+    </div>
 
 
 
