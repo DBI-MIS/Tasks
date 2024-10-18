@@ -6,6 +6,7 @@ use Filament\Notifications\Livewire\DatabaseNotifications;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\ServiceProvider;
 use Filament\Tables\Table;
 
@@ -29,6 +30,12 @@ class AppServiceProvider extends ServiceProvider
         Table::configureUsing(function (Table $table) {
             $table->paginated([6, 12, 27, 51, 102]);
         });
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::PAGE_START,
+            fn (array $scopes): View => view('loader', ['scopes' => $scopes]),
+            scopes: \Livewire\Livewire::current(),
+           );
 
         FilamentView::registerRenderHook(
             PanelsRenderHook::HEAD_END,
