@@ -1,7 +1,7 @@
 <x-filament-panels::page>
     
     <div class="w-full">
-    <div x-data wire:ignore.self class="flex flex-col sm:flex-row  gap-x-2">
+        <div x-data wire:ignore.self class="flex flex-col sm:flex-row gap-x-2 w-full">
     
             @foreach($statuses as $status)
             

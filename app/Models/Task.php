@@ -33,6 +33,7 @@ class Task extends Model implements Sortable
             'team',
             'text_color',
             'bg_color',
+            'task_status_id'
     ];
 
     protected $casts = [
@@ -110,6 +111,10 @@ class Task extends Model implements Sortable
     //     return $query->orderBy('due_date', 'desc');
     // }
 
+    public function status()
+    {
+        return $this->belongsTo(TaskStatus::class, 'task_status_id');
+    }
     
 
     

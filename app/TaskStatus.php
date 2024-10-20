@@ -23,6 +23,8 @@ enum TaskStatus: string implements HasLabel, HasColor, HasIcon
             static::Todo,
             static::OnGoing,
             static::ForReview,
+            // static::Done,
+            // static::OnHold,
         ];
     }
 

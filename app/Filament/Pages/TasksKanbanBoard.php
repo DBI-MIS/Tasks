@@ -64,9 +64,12 @@ class TasksKanbanBoard extends KanbanBoard
 
     protected static string $model = Task::class;
 
+    // protected static string $statusEnum = TaskStatus::class;
+
+
     protected static string $statusEnum = TaskStatus::class;
 
-    protected ?string $subheading = 'Mark as Done or Delete to remove from board.';
+    protected ?string $subheading = "Don't forget to mark as done.";
 
     protected static ?int $navigationSort = 2;
 
@@ -91,6 +94,7 @@ class TasksKanbanBoard extends KanbanBoard
     public $searchText;
 
     // public $recipient = auth()->user();
+    
 
     protected function records(): Collection
     {

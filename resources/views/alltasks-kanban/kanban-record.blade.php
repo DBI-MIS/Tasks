@@ -2,7 +2,7 @@
 
 <div id="{{ $record->getKey() }}"
     class="record flex flex-col {{ $record->bg_color }} dark:{{ $record->bg_color }} rounded-md p-4 cursor-grab  dark:text-gray-800 border-l-8 shadow-md border-slate-300 
-    {{ $record->text_color }} justify-between mb-3"
+    {{ $record->text_color }} justify-between mb-3 min-w-max max-w-[500px]"
      
     @if ($record->timestamps && now()->diffInSeconds($record->{$record::UPDATED_AT}) < 3) 
     x-data 
@@ -16,12 +16,9 @@
         " 
         @endif>
 
-
     <div class="flex flex-col justify-between mb-2">
-
-       
-
-            <details class="group/sub w-full">
+            
+        <details class="group/sub w-full">
                 <summary class="flex flex-row justify-between list-none cursor-pointer my-auto">
                     <div class="text-balance">
                         @if ($record['urgent'])
